@@ -1,5 +1,5 @@
 ﻿{
-  "iisSettings": {
+  /* "iisSettings": {
     "windowsAuthentication": false, 
     "anonymousAuthentication": true, 
     "iisExpress": {
@@ -14,7 +14,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
+    },*/
     "aspNetCoreTicketSystem": {
       "commandName": "Project",
       "launchBrowser": true,
