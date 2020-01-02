@@ -51,16 +51,33 @@ Risks for this project are those involving schedule conflicts caused by workers 
 
 # Overall Description
 
+This software project is meant to be standalone with there being no prior product relations.
+
 2.1 User Needs
 
+Primary users for this project are workers and managers for projects, their needs are viewing and collaborating with others for tasks, controlling task completion, and viewing task / project characteristics pertaining to project success.
+
+Secondary users are those who interact with workers on the project, their needs are for tickets to provide accurate information on project tasks for the workers so that they are completed on time and accurately, enabling secondary users to do their jobs. 
+
 2.2 Assumptions and Dependencies
+
+Factors that can effect fulfillment of user needs and requirements are those involving hosting the software on a web server using Microsoft Azure. These can involve increases in hosting costs which make it too costly to use the service any longer. Another factor for this project is that of maintaining internet connections with users and servers on Azure staying up without downtime.
+
+From the stated factors this project has dependencies involving Azure servers, pricing for hosting remaining within tolerable ranges, and maintianing a connection to users.
 
 # System Features and Requirements
 
 3.1 Functional Requirements
 
+
+
 3.2 External Interface Requirements
+
+
 
 3.3 System Features
 
+
+
 3.4 Nonfunctional Requirements
+
