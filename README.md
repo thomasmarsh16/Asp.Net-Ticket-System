@@ -76,3 +76,4 @@ System features for this project are that there is an internet connection, hosti
 3.3 Nonfunctional Requirements
 
 A nonfunctional requirement for this project is that security is to a high enough level where only authorized users can gain access to task functions and data along with prevention of database attacks such as SQL injections. Performance requirements for this project are that task data is returned to users within a second if there is a steady internet connection. Data transmitted should also be minimized in size to allow faster transfers on low bandwidth connections.
+

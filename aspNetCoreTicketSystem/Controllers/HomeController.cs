@@ -20,6 +20,7 @@ namespace aspNetCoreTicketSystem.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Message"] = "Hello Sir";
             return View();
         }
 
