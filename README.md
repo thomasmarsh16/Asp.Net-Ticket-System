@@ -22,11 +22,9 @@
 
             3.1 Functional Requirements
 
-            3.2 External Interface Requirements
+            3.2 System Features
 
-            3.3 System Features
-
-            3.4 Nonfunctional Requirements
+            3.3 Nonfunctional Requirements
 
 
 
@@ -61,23 +59,20 @@ Secondary users are those who interact with workers on the project, their needs 
 
 2.2 Assumptions and Dependencies
 
-Factors that can effect fulfillment of user needs and requirements are those involving hosting the software on a web server using Microsoft Azure. These can involve increases in hosting costs which make it too costly to use the service any longer. Another factor for this project is that of maintaining internet connections with users and servers on Azure staying up without downtime.
+Factors that can affect fulfillment of user needs and requirements are those involving hosting the software on a web server using Microsoft Azure. These can involve increases in hosting costs which make it too costly to use the service any longer. Another factor for this project is that of maintaining internet connections with users and servers on Azure staying up without downtime.
 
-From the stated factors this project has dependencies involving Azure servers, pricing for hosting remaining within tolerable ranges, and maintianing a connection to users.
+From the stated factors this project has dependencies involving Azure servers, pricing for hosting remaining within tolerable ranges, and maintaining a connection to users.
 
 # System Features and Requirements
 
 3.1 Functional Requirements
 
+Functional requirements for this project is that it can provide users with task information for projects and group/sort them by user assignment, what projects they are for, when tasks should be completed, and how long a task should be checked out. The software should also enable managers to view worker task completion data, progress on projects, assign and edit tasks, and to better control project completion.
 
+3.2 System Features
 
-3.2 External Interface Requirements
+System features for this project are that there is an internet connection, hosting of files is done by Microsoft Azure, and the database used is SQL based.
 
+3.3 Nonfunctional Requirements
 
-
-3.3 System Features
-
-
-
-3.4 Nonfunctional Requirements
-
+A nonfunctional requirement for this project is that security is to a high enough level where only authorized users can gain access to task functions and data along with prevention of database attacks such as SQL injections. Performance requirements for this project are that task data is returned to users within a second if there is a steady internet connection. Data transmitted should also be minimized in size to allow faster transfers on low bandwidth connections.
