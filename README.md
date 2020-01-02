@@ -49,3 +49,18 @@ The main objective for this software project is to provide a ticket system which
 Risks for this project are those involving schedule conflicts caused by workers being assigned more tasks than they can handle. Another risk for this project is that of server and connection issues causing workers to not be able to use the software.
 
 
+# Overall Description
+
+2.1 User Needs
+
+2.2 Assumptions and Dependencies
+
+# System Features and Requirements
+
+3.1 Functional Requirements
+
+3.2 External Interface Requirements
+
+3.3 System Features
+
+3.4 Nonfunctional Requirements
