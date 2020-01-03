@@ -24,6 +24,22 @@ namespace aspNetCoreTicketSystem.Controllers
             return View();
         }
 
+        public IActionResult Project( String projID)
+        {
+            ViewData["ProjectNum"] = projID;
+            return View();
+        }
+
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        public IActionResult Worker()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
