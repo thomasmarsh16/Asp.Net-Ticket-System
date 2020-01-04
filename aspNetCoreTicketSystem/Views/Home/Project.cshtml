@@ -1,4 +1,5 @@
-﻿
+﻿@model aspNetCoreTicketSystem.Models.Project
+
 @{
     ViewData["Title"] = "Project";
 }
@@ -6,6 +7,7 @@
     <div class="text-center">
         <h1 class="display-4">Welcome</h1>
         <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP</a>.</p>
-        <p>The project number is @ViewData["ProjectNum"]</p>
+        <p>The project number is @Html.DisplayFor(model => model.ProjectId)</p>
+        <p>The project name is @Html.DisplayFor( model => model.ProjectName)</p>
 
     </div>
