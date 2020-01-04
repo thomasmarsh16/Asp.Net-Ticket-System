@@ -24,10 +24,13 @@ namespace aspNetCoreTicketSystem.Controllers
             return View();
         }
 
-        public IActionResult Project( String projID)
+        public IActionResult Project( int projID )
         {
-            ViewData["ProjectNum"] = projID;
-            return View();
+            Project tempProj = new Project();
+            tempProj.ProjectName = "test project";
+            tempProj.ProjectId = projID;
+            
+            return View(tempProj);
         }
 
         public IActionResult Contact()
