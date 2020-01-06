@@ -57,5 +57,5 @@
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    <a asp-action="Index">Back to List</a>
+    @Html.ActionLink( "Back to List", "Index", new { queryString = Model.ProjectName } )
 </div>

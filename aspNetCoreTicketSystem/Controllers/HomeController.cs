@@ -25,7 +25,7 @@ namespace aspNetCoreTicketSystem.Controllers
             return View();
         }
 
-        public IActionResult Project( int projID )
+        public IActionResult Project( string projID )
         {
             Project tempProj = new Project();
             tempProj.ProjectName = "test project";

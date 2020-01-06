@@ -13,5 +13,7 @@ namespace aspNetCoreTicketSystem.Services
         System.Threading.Tasks.Task AddTaskAsync(ProjectTask task);
         System.Threading.Tasks.Task UpdateTaskAsync(string id, ProjectTask task);
         System.Threading.Tasks.Task DeleteTaskAsync(string id);
+
+        System.Threading.Tasks.Task AddProjectAsync(Project project);
     }
 }
