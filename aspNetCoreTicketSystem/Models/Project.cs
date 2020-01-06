@@ -10,8 +10,8 @@ namespace aspNetCoreTicketSystem.Models
     
     public class Project
     {
-        [JsonProperty(PropertyName = "projectId")]
-        public int ProjectId { get; set; }
+        [JsonProperty(PropertyName = "id")]
+        public string ProjectId { get; set; }
 
         [JsonProperty(PropertyName = "projectName")]
         public string ProjectName { get; set; }

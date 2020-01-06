@@ -19,9 +19,9 @@ namespace aspNetCoreTicketSystem.Controllers
         }
 
         [ActionName("Index")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index( string queryString )
         {
-            return View(await _cosmosDbService.GetTasksAsync("SELECT * FROM c"));
+            return View(await _cosmosDbService.GetTasksAsync("SELECT * FROM c WHERE c.projectName = \"" + queryString + "\""));
         }
 
         [ActionName("Create")]

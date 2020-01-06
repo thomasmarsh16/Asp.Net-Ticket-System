@@ -62,5 +62,10 @@
         {
             await this._container.UpsertItemAsync<ProjectTask>(task, new PartitionKey(id));
         }
+
+        public async System.Threading.Tasks.Task AddProjectAsync( Project project )
+        {
+            await this._container.CreateItemAsync<Project>(project, new PartitionKey(project.ProjectId));
+        }
     }
 }
