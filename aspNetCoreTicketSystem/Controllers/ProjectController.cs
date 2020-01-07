@@ -17,9 +17,12 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             _cosmosDbService = cosmosDbService;
         }
-        public IActionResult Index()
+
+
+        [ActionName("Index")]
+        public async Task<IActionResult> Index()
         {
-            return View();
+            return View(await _cosmosDbService.GetProjectsAsync("SELECT * FROM c WHERE c.projectDescription != null"));
         }
 
         [ActionName("Create")]
@@ -41,6 +44,69 @@ namespace aspNetCoreTicketSystem.Controllers
             }
 
             return View(project);
+        }
+
+
+        [HttpPost]
+        [ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditAsync([Bind("Id,ProjectName,ProjectDescription,Completed,StartDate,CompletionDate")] Project project)
+        {
+            if (ModelState.IsValid)
+            {
+                await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+                return Redirect("/Project/Index");
+            }
+            return View(project);
+        }
+
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(string id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            Project task = await _cosmosDbService.GetProjectAsync(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            return View(task);
+        }
+
+        [ActionName("Delete")]
+        public async Task<ActionResult> DeleteAsync(string id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            Project task = await _cosmosDbService.GetProjectAsync(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            return View(task);
+        }
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id)
+        {
+            await _cosmosDbService.DeleteProjectAsync(id);
+            return Redirect("/Project/Index");
+        }
+
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(string id)
+        {
+            return Redirect("/Task/Index?id=" + id);
         }
     }
 }

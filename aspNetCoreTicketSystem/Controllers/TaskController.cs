@@ -19,28 +19,34 @@ namespace aspNetCoreTicketSystem.Controllers
         }
 
         [ActionName("Index")]
-        public async Task<IActionResult> Index( string queryString )
+        public async Task<IActionResult> Index( string id )
         {
-            ViewData["projectName"] = queryString;
-            return View(await _cosmosDbService.GetTasksAsync("SELECT * FROM c WHERE c.taskName != null AND c.projectName = \"" + queryString + "\""));
+            Project temp = await _cosmosDbService.GetProjectAsync(id);
+            ViewData["projectName"] = temp.ProjectName;
+            ViewData["projectID"] = temp.ProjectId;
+            return View(await _cosmosDbService.GetTasksAsync("SELECT * FROM c WHERE c.projectID = \"" + id + "\""));
         }
 
         [ActionName("Create")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create(string id)
         {
+            Project temp = await _cosmosDbService.GetProjectAsync(id);
+            ViewData["projectName"] = temp.ProjectName;
+            ViewData["projectID"] = temp.ProjectId;
             return View();
         }
 
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("Id,taskName,Description,ProjectName,Completed,StartDate,CompletionDate")] ProjectTask task)
+        public async Task<ActionResult> CreateAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,CompletionDate")] ProjectTask task, string id)
         {
             if (ModelState.IsValid)
             {
                 task.Id = Guid.NewGuid().ToString();
+                task.ProjectID = id;
                 await _cosmosDbService.AddTaskAsync( task );
-                return Redirect("/Task/Index?queryString=" + task.ProjectName);
+                return Redirect("/Task/Index?id=" + task.ProjectID);
             }
 
             return View(task);
@@ -49,12 +55,13 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectName,Completed,StartDate,CompletionDate")] ProjectTask task)
+        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,CompletionDate")] ProjectTask task, string id)
         {
             if (ModelState.IsValid)
             {
+                task.ProjectID = id;
                 await _cosmosDbService.UpdateTaskAsync(task.Id, task);
-                return Redirect("/Task/Index?queryString=" + task.ProjectName);
+                return Redirect("/Task/Index?id=" + task.ProjectID);
             }
                 return View(task);
         }
@@ -77,7 +84,7 @@ namespace aspNetCoreTicketSystem.Controllers
         }
 
         [ActionName("Delete")]
-        public async Task<ActionResult> DeleteAsync(string id, string projectName)
+        public async Task<ActionResult> DeleteAsync(string id, string projectID)
         {
             if (id == null)
             {
@@ -85,6 +92,7 @@ namespace aspNetCoreTicketSystem.Controllers
             }
 
             ProjectTask task = await _cosmosDbService.GetTaskAsync(id);
+
             if (task == null)
             {
                 return NotFound();
@@ -96,10 +104,10 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id, string projectName)
+        public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id, string projectID)
         {
             await _cosmosDbService.DeleteTaskAsync(id);
-            return Redirect("/Task/Index?queryString=" + projectName);
+            return Redirect("/Task/Index?id=" + projectID);
         }
 
         [ActionName("Details")]
