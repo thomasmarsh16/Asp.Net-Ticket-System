@@ -9,7 +9,7 @@ namespace aspNetCoreTicketSystem.Models
 {
     public class Worker
     {
-        [JsonProperty(PropertyName = "workerID")]
+        [JsonProperty(PropertyName = "id")]
         public int WorkerId { get; set; }
 
         [JsonProperty(PropertyName = "workerName")]

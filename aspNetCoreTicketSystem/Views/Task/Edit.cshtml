@@ -31,16 +31,6 @@
     </div>
 
     <div class="form-group">
-        @Html.LabelFor(model => model.ProjectName, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            <div class="checkbox">
-                @Html.EditorFor(model => model.ProjectName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ProjectName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group">
         @Html.LabelFor(model => model.Completed, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
             <div class="checkbox">
@@ -79,6 +69,6 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index", new { queryString = Model.ProjectName })
+    @Html.ActionLink("Back to List", "Index", new { id = Model.ProjectID })
 </div>
 <script src="~/bundles/jqueryval"></script>

@@ -28,14 +28,6 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.ProjectName)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ProjectName)
-        </dd>
-
-        <dt>
             @Html.DisplayNameFor(model => model.Completed)
         </dt>
 
@@ -65,8 +57,8 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" data="@Model.ProjectName" class="btn btn-danger" /> |
-            @Html.ActionLink("Back to List", "Index", new { queryString = Model.ProjectName })
+            <input type="submit" value="Delete" data="@Model.ProjectID" class="btn btn-danger" /> |
+            @Html.ActionLink("Back to List", "Index", new { id = Model.ProjectID })
         </div>
     }
 </div>
