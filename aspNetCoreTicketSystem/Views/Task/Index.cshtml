@@ -9,9 +9,6 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">All tasks for @ViewData["projectName"]</h6>
-        <p>
-            @Html.ActionLink("Create a new task", "Create", new { id = ViewData["projectID"] })
-        </p>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -66,4 +63,10 @@
             </table>
         </div>
     </div>
+    <a class="nav-link" href="/Task/Create/@ViewData["projectID"]">
+        <i class="fas fa-fw fa-plus-square"></i>
+        <span>Create a new task</span>
+    </a>
 </div>
+
+

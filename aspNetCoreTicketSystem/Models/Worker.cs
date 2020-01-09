@@ -18,7 +18,7 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "workerPosition")]
         public string WorkerPosition { get; set; }
 
-        [JsonProperty(PropertyName = "workerPhNum")]
+        [JsonProperty(PropertyName = "workerPhoneNum")]
         public string WorkerPhoneNum { get; set; }
 
         [JsonProperty(PropertyName = "workerEmail")]
