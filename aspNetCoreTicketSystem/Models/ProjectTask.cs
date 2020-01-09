@@ -21,7 +21,7 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "projectID")]
         public string ProjectID { get; set; }
 
-        [JsonProperty(PropertyName = "completed")]
+        [JsonProperty(PropertyName = "completed")] 
         public bool Completed { get; set; }
 
         [JsonProperty(PropertyName = "StartDate")]

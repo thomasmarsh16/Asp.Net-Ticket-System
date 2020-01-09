@@ -34,7 +34,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("id,ProjectName,ProjectDescription,Completed,StartDate,CompletionDate")] Project project)
+        public async Task<ActionResult> CreateAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate")] Project project)
         {
             if (ModelState.IsValid)
             {
@@ -50,7 +50,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,Completed,StartDate,CompletionDate")] Project project, string id)
+        public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate")] Project project, string id)
         {
             if (ModelState.IsValid)
             {

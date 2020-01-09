@@ -59,7 +59,6 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                task.ProjectID = id;
                 await _cosmosDbService.UpdateTaskAsync(task.Id, task);
                 return Redirect("/Task/Index?id=" + task.ProjectID);
             }
