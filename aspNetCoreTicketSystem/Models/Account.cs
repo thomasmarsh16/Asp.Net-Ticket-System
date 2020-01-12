@@ -7,21 +7,21 @@ using Newtonsoft.Json;
 
 namespace aspNetCoreTicketSystem.Models
 {
-    public class Worker
+    public class Account
     {
         [JsonProperty(PropertyName = "id")]
-        public int WorkerId { get; set; }
+        public int accountId { get; set; }
 
         [JsonProperty(PropertyName = "workerName")]
-        public string WorkerName { get; set; }
+        public string accountName { get; set; }
 
         [JsonProperty(PropertyName = "workerPosition")]
-        public string WorkerPosition { get; set; }
+        public string accountPosition { get; set; }
 
         [JsonProperty(PropertyName = "workerPhoneNum")]
-        public string WorkerPhoneNum { get; set; }
+        public string accountPhoneNum { get; set; }
 
         [JsonProperty(PropertyName = "workerEmail")]
-        public string WorkerEmail { get; set; }
+        public string accountEmail { get; set; }
     }
 }

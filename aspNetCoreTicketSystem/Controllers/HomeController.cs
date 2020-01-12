@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using aspNetCoreTicketSystem.Models;
 using aspNetCoreTicketSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace aspNetCoreTicketSystem.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
