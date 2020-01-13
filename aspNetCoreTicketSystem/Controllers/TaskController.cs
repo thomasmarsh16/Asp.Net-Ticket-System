@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using aspNetCoreTicketSystem.Models;
 using aspNetCoreTicketSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace aspNetCoreTicketSystem.Controllers
 {
+    [Authorize]
     public class TaskController : Controller
     {
         private readonly ICosmosDbService _cosmosDbService;
@@ -18,6 +20,7 @@ namespace aspNetCoreTicketSystem.Controllers
             _cosmosDbService = cosmosDbService;
         }
 
+        
         [ActionName("Index")]
         public async Task<IActionResult> Index( string id )
         {

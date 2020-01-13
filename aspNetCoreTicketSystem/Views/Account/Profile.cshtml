@@ -1,0 +1,17 @@
+﻿@model aspNetCoreTicketSystem.Models.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "User Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h2>@ViewData["Title"].</h2>
+
+<h3>Profile Image</h3>
+<img src="@Model.ProfileImage" alt="" class="img-rounded img-responsive" />
+<br />
+<label>Name: </label>
+<h3>@Model.Name</h3>
+<label>Email: </label>
+<i class="glyphicon glyphicon-envelope"></i> @Model.EmailAddress
