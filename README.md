@@ -1,5 +1,3 @@
-link to working site: https://tickbox.azurewebsites.net/
-
 # System Requirements for Asp.Net-Ticket-System 
 
 --- Contents ---
