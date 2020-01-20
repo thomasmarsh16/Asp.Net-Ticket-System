@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using aspNetCoreTicketSystem.Models;
 using aspNetCoreTicketSystem.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace aspNetCoreTicketSystem.Controllers
 {

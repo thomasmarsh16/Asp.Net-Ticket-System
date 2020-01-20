@@ -23,6 +23,6 @@ namespace aspNetCoreTicketSystem.Services
         System.Threading.Tasks.Task UpdateProjectAsync(string id, Project project);
         System.Threading.Tasks.Task DeleteProjectAsync(string id);
 
-        // worker data async services
+        
     }
 }
