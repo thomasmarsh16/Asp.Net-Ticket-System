@@ -30,7 +30,7 @@
                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                     <div class="dropdown-header">Project Actions:</div>
                     <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
-                    <a class="dropdown-item" href="/Task/Checkout/@item.Id">Checkout Task</a>
+                    <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Add/View Workers</a>
                     <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
                 </div>
             </div>

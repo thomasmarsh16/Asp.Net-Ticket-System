@@ -32,5 +32,7 @@ namespace aspNetCoreTicketSystem.Models
         [DataType(DataType.Date)]
         public DateTime CompletionDate { get; set; }
 
+        [JsonProperty(PropertyName = "taskWorkers")]
+        public List<string> taskWorkers { get; set; }
     }
 }

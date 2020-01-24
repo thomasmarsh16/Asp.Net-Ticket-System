@@ -49,6 +49,8 @@ namespace aspNetCoreTicketSystem.Controllers
             {
                 task.Id = Guid.NewGuid().ToString();
                 task.ProjectID = id;
+                task.taskWorkers = new List<string>();
+                task.taskWorkers.Add( User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value );
                 await _cosmosDbService.AddTaskAsync( task );
                 return Redirect("/Task/Index?id=" + task.ProjectID);
             }
@@ -59,7 +61,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,CompletionDate")] ProjectTask task, string id)
+        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,CompletionDate,taskWorkers")] ProjectTask task, string id)
         {
             if (ModelState.IsValid)
             {
@@ -117,6 +119,28 @@ namespace aspNetCoreTicketSystem.Controllers
         public async Task<ActionResult> DetailsAsync(string id)
         {
             return View(await _cosmosDbService.GetTaskAsync(id));
+        }
+
+        [ActionName("AddWorker")]
+        public async Task<ActionResult> AddWorkerAsync(string id, string projectID)
+        {
+            ProjectTask task = await _cosmosDbService.GetTaskAsync(id);
+
+            return View(task);
+        }
+
+        [HttpPost]
+        [ActionName("AddWorker")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddWorkerAsync([FromForm] string taskWorkers, string id, string projectID)
+        {
+            ProjectTask task = await _cosmosDbService.GetTaskAsync(id);
+
+            task.taskWorkers.Add(taskWorkers);
+
+            await _cosmosDbService.UpdateTaskAsync(task.Id, task);
+
+            return Redirect("/Task/Index?id=" + projectID);
         }
     }
 }
