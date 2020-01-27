@@ -29,5 +29,8 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "projectCompleteDate")]
         [DataType(DataType.Date)]
         public DateTime CompletionDate { get; set; }
+
+        [JsonProperty(PropertyName = "projectWorkers")]
+        public List<string> projectWorkers { get; set; }
     }
 }

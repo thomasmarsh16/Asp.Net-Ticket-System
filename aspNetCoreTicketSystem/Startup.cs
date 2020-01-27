@@ -54,8 +54,8 @@ namespace aspNetCoreTicketSystem
                 options.Authority = $"https://tick-box.auth0.com";
 
                 // Configure the Auth0 Client ID and Client Secret ( changed for production )
-                options.ClientId = "M7glRlrjCMJbnHYlUCx4Dg8oBfgd7KBG";
-                options.ClientSecret = "PCCEe0Y0_oaGjtihDgi_PbYusIG3zH9fc1PSKmLqI56DlVDwoh_bVotzCYegzZqk";
+                options.ClientId = Environment.GetEnvironmentVariable("AUTH0_CLIENTID");
+                options.ClientSecret = Environment.GetEnvironmentVariable("AUTH0_SECRET");
 
                 // Saves tokens to the AuthenticationProperties
                 options.SaveTokens = true;
@@ -165,7 +165,7 @@ namespace aspNetCoreTicketSystem
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Project}/{action=Index}/{id?}");
             });
 
 
