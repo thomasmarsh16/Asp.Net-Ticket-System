@@ -8,6 +8,11 @@ using Microsoft.Extensions.Logging;
 using aspNetCoreTicketSystem.Models;
 using aspNetCoreTicketSystem.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System;
+using System.Threading.Tasks;
 
 namespace aspNetCoreTicketSystem.Controllers
 {
@@ -23,7 +28,9 @@ namespace aspNetCoreTicketSystem.Controllers
         [ActionName("Index")]
         public async Task<IActionResult> Index()
         {
-            return View(await _cosmosDbService.GetProjectsAsync("SELECT * FROM c WHERE c.projectDescription != null"));
+            string userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            return View(await _cosmosDbService.GetProjectsAsync("SELECT * FROM c WHERE ARRAY_CONTAINS(c.projectWorkers,\"" + userEmail + "\")"));
         }
 
         [ActionName("Create")]
@@ -40,6 +47,8 @@ namespace aspNetCoreTicketSystem.Controllers
             if (ModelState.IsValid)
             {
                 project.ProjectId = Guid.NewGuid().ToString();
+                project.projectWorkers = new List<string>();
+                project.projectWorkers.Add(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value);
                 await _cosmosDbService.AddProjectAsync(project);
                 return RedirectToAction("Index");
             }
@@ -108,6 +117,41 @@ namespace aspNetCoreTicketSystem.Controllers
         public async Task<ActionResult> DetailsAsync(string id)
         {
             return Redirect("/Task/Index?id=" + id);
+        }
+
+        [ActionName("AddWorker")]
+        public async Task<ActionResult> AddWorkerAsync(string id)
+        {
+            Project project = await _cosmosDbService.GetProjectAsync(id);
+
+            return View(project);
+        }
+
+        [HttpPost]
+        [ActionName("AddWorker")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> AddWorkerAsync([FromForm] string projectWorker, string projectID)
+        {
+            Project project = await _cosmosDbService.GetProjectAsync(projectID);
+
+            if ( !project.projectWorkers.Contains(projectWorker) ) // if new worker not in project viewers update list.
+            {
+                project.projectWorkers.Add(projectWorker);
+                await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+
+                //var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                var apiKey = "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";
+                var client = new SendGridClient(apiKey);
+                var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                var subject = "You have been invited to work on a tickbox project";
+                var to = new EmailAddress(projectWorker, "");
+                var plainTextContent = "Congradulations, " + User.Identity.Name + " has invited you to work on a project at tickbox, click the link to view the project ";
+                var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                var response = await client.SendEmailAsync(msg);
+            }
+
+            return Redirect("/Project/Index");
         }
     }
 }
