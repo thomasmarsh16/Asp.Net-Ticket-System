@@ -43,12 +43,13 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,CompletionDate")] ProjectTask task, string id)
+        public async Task<ActionResult> CreateAsync([Bind("Id,taskName,Description,ProjectID,StartDate,dueDate")] ProjectTask task, string id)
         {
             if (ModelState.IsValid)
             {
                 task.Id = Guid.NewGuid().ToString();
                 task.ProjectID = id;
+                task.Completed = false;
                 task.taskWorkers = new List<string>();
                 task.taskWorkers.Add( User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value );
                 await _cosmosDbService.AddTaskAsync( task );
@@ -61,10 +62,20 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,CompletionDate,taskWorkers")] ProjectTask task, string id)
+        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,dueDate,taskWorkers")] ProjectTask task)
         {
             if (ModelState.IsValid)
             {
+                if (task.Completed == false )
+                {
+                    task.CompletionDate = new DateTime();
+                    task.checkoutName = "";
+                }
+                else
+                {
+                    task.CompletionDate = DateTime.Now;
+                    task.checkoutName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                }
                 await _cosmosDbService.UpdateTaskAsync(task.Id, task);
                 return Redirect("/Task/Index?id=" + task.ProjectID);
             }
