@@ -16,47 +16,118 @@
     </a>
 </div>
 
+<div class="card mb-4 py-3 border-bottom-primary">
+    <div class="card-body">
+        <h4>Incomplete Tasks: Ordered by due-date</h4>
+    </div>
+</div>
 
 @foreach (var item in Model)
 {
-    <div class="card shadow mb-4">
-        <!-- Card Header - Dropdown -->
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">@item.taskName</h6>
-            <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                    <div class="dropdown-header">Project Actions:</div>
-                    <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
-                    <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Add/View Workers</a>
-                    <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+    @if (item.Completed != true)
+    {
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">@item.taskName</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-header">Project Actions:</div>
+                        <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                        <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Add/View Workers</a>
+                        <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                    </div>
                 </div>
             </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        <label>Description</label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </dd>
+                    <dt class="col-sm-2">
+                        <label>Start Date</label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </dd>
+                    <dt class="col-sm-2">
+                        <label>Due Date</label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(modelItem => item.dueDate)
+                    </dd>
+
+                    <dt class="col-sm-2">
+                        <label><em>Worker Emails</em></label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @foreach (string email in item.taskWorkers)
+                        {
+                            <p>@email</p>
+                        }
+                    </dd>
+                </dl>
+            </div>
         </div>
-        <!-- Card Body -->
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-2">
-                    <label>Description</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.Description)
-                </dd>
-                <dt class="col-sm-2">
-                    <label>Start Date</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </dd>
-                <dt class="col-sm-2">
-                    <label>Completion Date</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.CompletionDate)
-                </dd>
-            </dl>
-        </div>
+    }
+}
+
+<div class="card mb-4 py-3 border-bottom-primary">
+    <div class="card-body">
+        <h4>Completed Tasks</h4>
     </div>
+</div>
+
+@foreach (var item in Model)
+{
+    @if (item.Completed == true)
+    {
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">@item.taskName</h6>
+                <div class="dropdown no-arrow">
+                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-header">Project Actions:</div>
+                        <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                        <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Add/View Workers</a>
+                        <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        <label>Description</label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </dd>
+                    <dt class="col-sm-2">
+                        <label>Completion Date</label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(modelItem => item.CompletionDate)
+                    </dd>
+                    <dt class="col-sm-2">
+                        <label>Checked out by</label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(modelItem => item.checkoutName)
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    }
 }

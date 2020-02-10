@@ -18,7 +18,7 @@
                 <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                     <div class="dropdown-header">Project Actions:</div>
                     <a class="dropdown-item" href="/Project/Edit/@item.ProjectId">Edit</a>
-                    <a class="dropdown-item" href="/Project/AddWorker/@item.ProjectId">Add/View Workers</a>
+                    <a class="dropdown-item" href="/Project/AddWorker/@item.ProjectId">Viewers</a>
                     <a class="dropdown-item" href="/Project/Details/@item.ProjectId">Project Tasks</a>
                     <a class="dropdown-item" href="/Project/Delete/@item.ProjectId">Delete</a>
                 </div>
@@ -32,12 +32,6 @@
                 </dt>
                 <dd class="col-sm-10">
                     @Html.DisplayFor(modelItem => item.ProjectDescription)
-                </dd>
-                <dt class="col-sm-2">
-                    <label>Completed</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.CompletedProj)
                 </dd>
                 <dt class="col-sm-2">
                     <label>Start Date</label>

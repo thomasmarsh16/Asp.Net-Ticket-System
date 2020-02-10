@@ -30,7 +30,7 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             string userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            return View(await _cosmosDbService.GetProjectsAsync("SELECT * FROM c WHERE ARRAY_CONTAINS(c.projectWorkers,\"" + userEmail + "\")"));
+            return View(await _cosmosDbService.GetProjectsAsync(userEmail));
         }
 
         [ActionName("Create")]
@@ -42,11 +42,12 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate")] Project project)
+        public async Task<ActionResult> CreateAsync([Bind("id,ProjectName,ProjectDescription,StartDate,CompletionDate")] Project project)
         {
             if (ModelState.IsValid)
             {
                 project.ProjectId = Guid.NewGuid().ToString();
+                project.CompletedProj = false;
                 project.projectWorkers = new List<string>();
                 project.projectWorkers.Add(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value);
                 await _cosmosDbService.AddProjectAsync(project);
@@ -59,7 +60,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate")] Project project, string id)
+        public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate,projectWorkers")] Project project, string id)
         {
             if (ModelState.IsValid)
             {
@@ -139,8 +140,7 @@ namespace aspNetCoreTicketSystem.Controllers
                 project.projectWorkers.Add(projectWorker);
                 await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
 
-                //var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-                var apiKey = "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";
+                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
                 var client = new SendGridClient(apiKey);
                 var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
                 var subject = "You have been invited to work on a tickbox project";

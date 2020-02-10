@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace aspNetCoreTicketSystem.Models
 {
@@ -28,11 +29,18 @@ namespace aspNetCoreTicketSystem.Models
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
+        [JsonProperty(PropertyName = "dueDate")]
+        [DataType(DataType.Date)]
+        public DateTime dueDate { get; set; }
+
+        [JsonProperty(PropertyName = "taskWorkers")]
+        public List<string> taskWorkers { get; set; }
+
         [JsonProperty(PropertyName = "CompletionDate")]
         [DataType(DataType.Date)]
         public DateTime CompletionDate { get; set; }
 
-        [JsonProperty(PropertyName = "taskWorkers")]
-        public List<string> taskWorkers { get; set; }
+        [JsonProperty(PropertyName = "checkoutName")]
+        public string checkoutName { get; set; }
     }
 }
