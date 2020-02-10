@@ -30,7 +30,7 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             string userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            return View(await _cosmosDbService.GetProjectsAsync("SELECT * FROM c WHERE ARRAY_CONTAINS(c.projectWorkers,\"" + userEmail + "\")"));
+            return View(await _cosmosDbService.GetProjectsAsync(userEmail));
         }
 
         [ActionName("Create")]

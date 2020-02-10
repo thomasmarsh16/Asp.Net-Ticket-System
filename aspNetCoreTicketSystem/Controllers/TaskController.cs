@@ -28,7 +28,8 @@ namespace aspNetCoreTicketSystem.Controllers
             Project temp = await _cosmosDbService.GetProjectAsync(id);
             ViewData["projectName"] = temp.ProjectName;
             ViewData["projectID"] = temp.ProjectId;
-            return View(await _cosmosDbService.GetTasksAsync("SELECT * FROM c WHERE c.projectID = \"" + id + "\""));
+            List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
+            return View(sortedTasks);
         }
 
         [ActionName("Create")]

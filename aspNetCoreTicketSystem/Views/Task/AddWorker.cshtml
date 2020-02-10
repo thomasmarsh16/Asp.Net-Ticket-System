@@ -15,16 +15,15 @@
 
             <div class="card-body">
                 <div class="col-md-2">
-                    <label>Emails</label>
+                    <label><em>Emails</em></label>
                 </div>
-                <dl >
-
-                        @foreach (string email in Model.taskWorkers)
-                        {
-                            <dd class="col-sm-10">
-                                <p>@email</p>
-                            </dd>
-                        }
+                <dl>
+                    @foreach (string email in Model.taskWorkers)
+                    {
+                        <dd class="col-sm-10">
+                            <p>@email</p>
+                        </dd>
+                    }
                 </dl>
             </div>
         </div>

@@ -16,7 +16,11 @@
     </a>
 </div>
 
-<h2>Incomplete Tasks</h2>
+<div class="card mb-4 py-3 border-bottom-primary">
+    <div class="card-body">
+        <h4>Incomplete Tasks: Ordered by due-date</h4>
+    </div>
+</div>
 
 @foreach (var item in Model)
 {
@@ -59,15 +63,27 @@
                     <dd class="col-sm-10">
                         @Html.DisplayFor(modelItem => item.dueDate)
                     </dd>
+
+                    <dt class="col-sm-2">
+                        <label><em>Worker Emails</em></label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        @foreach (string email in item.taskWorkers)
+                        {
+                            <p>@email</p>
+                        }
+                    </dd>
                 </dl>
             </div>
         </div>
     }
 }
 
-<hr />
-
-<h2>Completed Tasks</h2>
+<div class="card mb-4 py-3 border-bottom-primary">
+    <div class="card-body">
+        <h4>Completed Tasks</h4>
+    </div>
+</div>
 
 @foreach (var item in Model)
 {

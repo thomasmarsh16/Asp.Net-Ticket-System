@@ -35,6 +35,7 @@
         {
             try
             {
+
                 ItemResponse<ProjectTask> response = await this._container.ReadItemAsync<ProjectTask>(id, new PartitionKey(id));
                 return response.Resource;
             }
@@ -45,13 +46,16 @@
 
         }
 
-        public async Task<IEnumerable<ProjectTask>> GetTasksAsync(string queryString)
+        public async Task<List<ProjectTask>> GetTasksAsync(string id)
         {
-            var query = this._container.GetItemQueryIterator<ProjectTask>(new QueryDefinition(queryString));
+            QueryDefinition query = new QueryDefinition("SELECT * FROM c WHERE c.projectID = @id ORDER BY c.dueDate")
+                .WithParameter("@id", id);
+
+            var queryResults = this._container.GetItemQueryIterator<ProjectTask>( query );
             List<ProjectTask> results = new List<ProjectTask>();
-            while (query.HasMoreResults)
+            while (queryResults.HasMoreResults)
             {
-                var response = await query.ReadNextAsync();
+                var response = await queryResults.ReadNextAsync();
 
                 results.AddRange(response.ToList());
             }
@@ -66,13 +70,16 @@
 
 
         // project async services
-        public async Task<IEnumerable<Project>> GetProjectsAsync(string queryString)
+        public async Task<IEnumerable<Project>> GetProjectsAsync(string userEmail)
         {
-            var query = this._container.GetItemQueryIterator<Project>(new QueryDefinition(queryString));
+            QueryDefinition query = new QueryDefinition("SELECT * FROM c WHERE ARRAY_CONTAINS(c.projectWorkers, @userEmail)")
+                    .WithParameter("@userEmail", userEmail);
+
+            var queryResults = this._container.GetItemQueryIterator<Project>( query );
             List<Project> results = new List<Project>();
-            while (query.HasMoreResults)
+            while (queryResults.HasMoreResults)
             {
-                var response = await query.ReadNextAsync();
+                var response = await queryResults.ReadNextAsync();
 
                 results.AddRange(response.ToList());
             }
