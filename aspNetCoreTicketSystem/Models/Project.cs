@@ -19,6 +19,9 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "projectDescription")]
         public string ProjectDescription { get; set; }
 
+        [JsonProperty(PropertyName = "projectManager")]
+        public string ProjectManager { get; set; }
+
         [JsonProperty(PropertyName = "completedProj")]
         public Boolean CompletedProj { get; set; }
 

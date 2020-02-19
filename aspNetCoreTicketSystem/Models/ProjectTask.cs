@@ -19,6 +19,9 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "Description")]
         public string Description { get; set; }
 
+        [JsonProperty(PropertyName = "Importance")]
+        public string Importance { get; set; }
+
         [JsonProperty(PropertyName = "projectID")]
         public string ProjectID { get; set; }
 

@@ -4,7 +4,62 @@
     ViewData["Title"] = "taskIndex";
 }
 
+<div class="row">
 
+    <div class="col-xl-8 col-lg-7">
+
+        <!-- History Line Chart -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Completion History for @ViewData["projectName"]</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+        <script>
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                // The type of chart we want to create
+                type: 'line',
+
+                // The data for our dataset
+                data: {
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: 'My First dataset',
+                        backgroundColor: 'rgb(255, 99, 132)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: [0, 10, 5, 2, 20, 30, 45]
+                    }]
+                },
+
+                // Configuration options go here
+                options: {}
+            });
+        </script>
+
+    </div>
+
+    <!-- Donut Chart for task importance -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Importance Breakdown</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4">
+                    <canvas width="348" height="316" class="chartjs" data-numbers='@ViewData["pieChart"]' id="myPieChart" style="width: 279px; height: 253px; display: block;"></canvas>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task list -->
 
 <div class="card shadow mb-4">
     <div class="card-header py-3">
@@ -16,118 +71,56 @@
     </a>
 </div>
 
-<div class="card mb-4 py-3 border-bottom-primary">
+<div class="card shadow mb-4">
     <div class="card-body">
-        <h4>Incomplete Tasks: Ordered by due-date</h4>
+        <div class="table-responsive">
+            <table class="display responsive nowrap" id="dataTable" width="100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.taskName</td>
+                            <td>@item.Description</td>
+                            <td>@item.Importance</td>
+                            <td>@item.StartDate</td>
+                            <td>@item.dueDate</td>
+                            <td>
+                                <div class="dropdown no-arrow">
+                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                        <div class="dropdown-header">Task Actions:</div>
+                                        <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                                        <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
+                                        <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-@foreach (var item in Model)
-{
-    @if (item.Completed != true)
-    {
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">@item.taskName</h6>
-                <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                        <div class="dropdown-header">Project Actions:</div>
-                        <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
-                        <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Add/View Workers</a>
-                        <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-2">
-                        <label>Description</label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </dd>
-                    <dt class="col-sm-2">
-                        <label>Start Date</label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(modelItem => item.StartDate)
-                    </dd>
-                    <dt class="col-sm-2">
-                        <label>Due Date</label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(modelItem => item.dueDate)
-                    </dd>
-
-                    <dt class="col-sm-2">
-                        <label><em>Worker Emails</em></label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @foreach (string email in item.taskWorkers)
-                        {
-                            <p>@email</p>
-                        }
-                    </dd>
-                </dl>
-            </div>
-        </div>
-    }
-}
-
-<div class="card mb-4 py-3 border-bottom-primary">
-    <div class="card-body">
-        <h4>Completed Tasks</h4>
-    </div>
-</div>
-
-@foreach (var item in Model)
-{
-    @if (item.Completed == true)
-    {
-        <div class="card shadow mb-4">
-            <!-- Card Header - Dropdown -->
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">@item.taskName</h6>
-                <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                        <div class="dropdown-header">Project Actions:</div>
-                        <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
-                        <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Add/View Workers</a>
-                        <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Card Body -->
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-2">
-                        <label>Description</label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </dd>
-                    <dt class="col-sm-2">
-                        <label>Completion Date</label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(modelItem => item.CompletionDate)
-                    </dd>
-                    <dt class="col-sm-2">
-                        <label>Checked out by</label>
-                    </dt>
-                    <dd class="col-sm-10">
-                        @Html.DisplayFor(modelItem => item.checkoutName)
-                    </dd>
-                </dl>
-            </div>
-        </div>
-    }
-}
