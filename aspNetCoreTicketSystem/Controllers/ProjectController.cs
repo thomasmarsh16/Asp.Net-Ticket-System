@@ -47,6 +47,7 @@ namespace aspNetCoreTicketSystem.Controllers
             if (ModelState.IsValid)
             {
                 project.ProjectId = Guid.NewGuid().ToString();
+                project.ProjectManager = User.Identity.Name + ", " + User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 project.CompletedProj = false;
                 project.projectWorkers = new List<string>();
                 project.projectWorkers.Add(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value);

@@ -14,8 +14,8 @@
         <div class="card-body">
             <div class="form-horizontal">
                 <div class="form-group">
-                    @Html.LabelFor(model => model.taskName, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
+                        <label>Task Name</label>
                         <div class="checkbox">
                             @Html.EditorFor(model => model.taskName, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.taskName, "", new { @class = "text-danger" })
@@ -34,6 +34,35 @@
                 </div>
 
                 <div class="form-group">
+                    <div class="col-md-10">
+                        <label>Importance</label>
+                        <select class="selectpicker" id="Importance" name="Importance">
+
+                            @if (Model.Importance == "Low")
+                            {
+                                <option value="Low" selected>Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            }
+                            else if (Model.Importance == "Medium")
+                            {
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            }
+                            else if (Model.Importance == "High")
+                            {
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High" selected>High</option>
+                            }
+
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     @Html.LabelFor(model => model.Completed, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
                         <div class="checkbox">
@@ -44,8 +73,8 @@
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
+                        <label>Start Date</label>
                         <div class="checkbox">
                             @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
@@ -54,8 +83,8 @@
                 </div>
 
                 <div class="form-group">
-                    @Html.LabelFor(model => model.dueDate, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
+                        <label>Due Date</label>
                         <div class="checkbox">
                             @Html.EditorFor(model => model.dueDate, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.dueDate, "", new { @class = "text-danger" })

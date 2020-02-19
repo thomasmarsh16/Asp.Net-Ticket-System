@@ -27,8 +27,8 @@
 
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             <div class="form-group">
-                @Html.LabelFor(model => model.taskName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
+                    <label>Task Name</label>
                     @Html.EditorFor(model => model.taskName, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.taskName, "", new { @class = "text-danger" })
                 </div>
@@ -43,16 +43,27 @@
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
+                    <label>Importance</label>
+                    <select class="selectpicker" id="Importance" name="Importance" size="3">
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-10">
+                    <label>Start Date</label>
                     @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.dueDate, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
+                    <label>Due Date</label>
                     @Html.EditorFor(model => model.dueDate, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.dueDate, "", new { @class = "text-danger" })
                 </div>

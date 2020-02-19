@@ -26,9 +26,32 @@ namespace aspNetCoreTicketSystem.Controllers
         public async Task<IActionResult> Index( string id )
         {
             Project temp = await _cosmosDbService.GetProjectAsync(id);
+            List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
+
+            int numLow = 0;
+            int numMed = 0;
+            int numHigh = 0;
+
+            foreach( ProjectTask task in sortedTasks )
+            {
+                switch(task.Importance)
+                {
+                    case "Low":
+                        numLow++;
+                        break;
+                    case "Medium":
+                        numMed++;
+                        break;
+                    case "High":
+                        numHigh++;
+                        break;
+                }
+            }
+
             ViewData["projectName"] = temp.ProjectName;
             ViewData["projectID"] = temp.ProjectId;
-            List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
+            ViewData["pieChart"] = "[\"" + numLow +"\",\"" + numMed + "\",\"" + numHigh + "\"]";
+            
             return View(sortedTasks);
         }
 
@@ -44,7 +67,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync([Bind("Id,taskName,Description,ProjectID,StartDate,dueDate")] ProjectTask task, string id)
+        public async Task<ActionResult> CreateAsync([Bind("Id,taskName,Description,Importance,ProjectID,StartDate,dueDate")] ProjectTask task, string id)
         {
             if (ModelState.IsValid)
             {
@@ -63,7 +86,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,ProjectID,Completed,StartDate,dueDate,taskWorkers")] ProjectTask task)
+        public async Task<ActionResult> EditAsync([Bind("Id,taskName,Description,Importance,ProjectID,Completed,StartDate,dueDate,taskWorkers")] ProjectTask task)
         {
             if (ModelState.IsValid)
             {
