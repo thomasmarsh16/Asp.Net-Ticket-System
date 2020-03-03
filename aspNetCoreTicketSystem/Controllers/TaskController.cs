@@ -10,6 +10,7 @@ using aspNetCoreTicketSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
+
 namespace aspNetCoreTicketSystem.Controllers
 {
     [Authorize]
@@ -153,7 +154,15 @@ namespace aspNetCoreTicketSystem.Controllers
         [ActionName("Details")]
         public async Task<ActionResult> DetailsAsync(string id)
         {
-            return View(await _cosmosDbService.GetTaskAsync(id));
+            ProjectTask currentTask = await _cosmosDbService.GetTaskAsync(id);
+            List<Comment> sortedComments = await _cosmosDbService.GetCommentsAsync(id);
+
+            if ( sortedComments != null )
+            {
+                ViewData["taskComments"] = sortedComments;
+            }
+
+            return View(currentTask );
         }
 
         [ActionName("AddWorker")]

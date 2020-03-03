@@ -23,6 +23,9 @@ namespace aspNetCoreTicketSystem.Services
         System.Threading.Tasks.Task UpdateProjectAsync(string id, Project project);
         System.Threading.Tasks.Task DeleteProjectAsync(string id);
 
-        
+        // Task Comment async services
+        Task<List<Comment>> GetCommentsAsync(string ProjectID);
+
+        System.Threading.Tasks.Task AddCommentAsync(Comment comment);
     }
 }

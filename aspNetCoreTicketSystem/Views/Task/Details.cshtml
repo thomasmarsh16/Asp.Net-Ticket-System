@@ -5,47 +5,57 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Details for @Model.taskName</h6>
-    </div>
-    <div class="card-body">
-        <label>Description</label>
-        <p>@Model.Description</p>
-        <label>Start Date</label>
-        <p>@Model.StartDate</p>
-        <label>Due Date</label>
-        <p>@Model.dueDate</p>
-    </div>
-    <div class="card-footer">
+@Html.AntiForgeryToken()
 
+<div class="row">
+
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Workers for @Model.taskName</h6>
+            </div>
+            <div class="card-body">
+                @foreach (string email in Model.taskWorkers)
+                {
+                    <dl class="col-sm-10">
+                        <p>@email</p>
+                    </dl>
+                }
+            </div>
+        </div>
     </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Details for @Model.taskName</h6>
+            </div>
+            <div class="card-body">
+                <label>Description</label>
+                <p>@Model.Description</p>
+                <label>Start Date</label>
+                <p>@Model.StartDate</p>
+                <label>Due Date</label>
+                <p>@Model.dueDate</p>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Workers for @Model.taskName</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Comments for @Model.taskName</h6>
     </div>
-    <div class="card-body">
-        @foreach (string email in Model.taskWorkers)
-        {
-            <dd class="col-sm-10">
-                <p>@email</p>
-            </dd>
-        }
-    </div>
-    <div class="card-footer">
-
-    </div>
-</div>
-
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Comments for @Model.taskName</h6></div>
     <div class="card-body">
 
     </div>
     <div class="card-footer">
-
+        <form action="/Task/AddComment" method="Post">
+            <label for="commentBox">Enter a comment: </label>
+            <input type="text" id="commentBox" name="commentContents">
+            <input type="hidden" name="taskID" value="@Model.Id"><br><br>
+            <input type="submit" value="Submit">
+        </form>
     </div>
 </div>
