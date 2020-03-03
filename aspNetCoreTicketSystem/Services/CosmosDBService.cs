@@ -114,5 +114,29 @@
         {
             await this._container.DeleteItemAsync<Project>(id, new PartitionKey(id));
         }
+
+
+        // comment async services
+        public async Task<List<Comment>> GetCommentsAsync(string taskID)
+        {
+            QueryDefinition query = new QueryDefinition("SELECT * FROM c WHERE c.TaskID = @taskID ORDER BY c.dueDate")
+            .WithParameter("@taskID", taskID);
+
+            var queryResults = this._container.GetItemQueryIterator<Comment>(query);
+            List<Comment> results = new List<Comment>();
+            while (queryResults.HasMoreResults)
+            {
+                var response = await queryResults.ReadNextAsync();
+
+                results.AddRange(response.ToList());
+            }
+
+            return results;
+        }
+
+        public async System.Threading.Tasks.Task AddCommentAsync(Comment comment)
+        {
+            await this._container.CreateItemAsync<Comment>(comment, new PartitionKey(comment.Id));
+        }
     }
 }

@@ -63,15 +63,10 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">All tasks for @ViewData["projectName"]</h6>
+        <h6 class="m-0 font-weight-bold text-primary">
+            All tasks for @ViewData["projectName"]
+        </h6>
     </div>
-    <a class="nav-link" href="/Task/Create/@ViewData["projectID"]">
-        <i class="fas fa-fw fa-plus-square"></i>
-        <span>Create a new task</span>
-    </a>
-</div>
-
-<div class="card shadow mb-4">
     <div class="card-body">
         <div class="table-responsive">
             <table class="display responsive nowrap" id="dataTable" width="100%">
@@ -122,5 +117,11 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="card-footer">
+        <a class="nav-link" href="/Task/Create/@ViewData["projectID"]">
+            <i class="fas fa-fw fa-plus-square"></i>
+            <span>Create a new task</span>
+        </a>
     </div>
 </div>
