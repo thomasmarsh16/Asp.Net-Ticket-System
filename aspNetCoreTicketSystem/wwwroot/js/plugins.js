@@ -1,7 +1,32 @@
 ﻿window.onload = function () {
 
-    var ctx = document.getElementById('myPieChart');
-    var x = $('#myPieChart').data('numbers');
+    // start data tables
+    $('#dataTable').DataTable();
+    $('#completeddataTable').DataTable();
+
+    // completion chart code
+    var ctx = document.getElementById("completionChart");
+
+    var completionDates = $('#completionChart').data('completiondates');
+    var completionNumbers = $('#completionChart').data('completionnum');
+
+    var myLineChart = new Chart(ctx, {
+        type: 'line',
+
+        data: {
+            datasets: [{
+                label: 'task Completion',
+                data: completionNumbers,
+                borderColor: 'rgb(65,105,225)',
+            }],
+            labels: completionDates,
+        },
+        options: {}
+    });
+
+    // pie chart code
+    var ctx = document.getElementById('categoriesPieChart');
+    var x = $('#categoriesPieChart').data('numbers');
 
     var myDoughnutChart = new Chart(ctx, {
         type: 'doughnut',

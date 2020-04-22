@@ -14,31 +14,9 @@
                 <h6 class="m-0 font-weight-bold text-primary">Task Completion History for @ViewData["projectName"]</h6>
             </div>
             <div class="card-body">
-                <canvas id="myChart"></canvas>
+                <canvas id="completionChart" data-completionnum='@ViewData["completionNumbers"]' data-completiondates='@ViewData["completionDates"]' class="chartjs"></canvas>
             </div>
         </div>
-        <script>
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                // The type of chart we want to create
-                type: 'line',
-
-                // The data for our dataset
-                data: {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                    datasets: [{
-                        label: 'My First dataset',
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        data: [0, 10, 5, 2, 20, 30, 45]
-                    }]
-                },
-
-                // Configuration options go here
-                options: {}
-            });
-        </script>
-
     </div>
 
     <!-- Donut Chart for task importance -->
@@ -51,20 +29,19 @@
             <!-- Card Body -->
             <div class="card-body">
                 <div class="chart-pie pt-4">
-                    <canvas width="348" height="316" class="chartjs" data-numbers='@ViewData["pieChart"]' id="myPieChart" style="width: 279px; height: 253px; display: block;"></canvas>
-
+                    <canvas width="348" height="316" class="chartjs" data-numbers='@ViewData["pieChart"]' id="categoriesPieChart" style="width: 279px; height: 253px; display: block;"></canvas>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Task list -->
+<!-- Uncompleted Task list -->
 
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">
-            All tasks for @ViewData["projectName"]
+            Uncompleted tasks for @ViewData["projectName"]
         </h6>
     </div>
     <div class="card-body">
@@ -93,26 +70,29 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>@item.taskName</td>
-                            <td>@item.Description</td>
-                            <td>@item.Importance</td>
-                            <td>@item.StartDate</td>
-                            <td>@item.dueDate</td>
-                            <td>
-                                <div class="dropdown no-arrow">
-                                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
-                                    </a>
-                                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                                        <div class="dropdown-header">Task Actions:</div>
-                                        <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
-                                        <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
-                                        <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                        @if ( !item.Completed )
+                        {
+                            <tr>
+                                <td>@item.taskName</td>
+                                <td>@item.Description</td>
+                                <td>@item.Importance</td>
+                                <td>@item.StartDate.ToString("MM/dd/yyyy")</td>
+                                <td>@item.dueDate.ToString("MM/dd/yyyy")</td>
+                                <td>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Task Actions:</div>
+                                            <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                                            <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
+                                            <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
@@ -123,5 +103,69 @@
             <i class="fas fa-fw fa-plus-square"></i>
             <span>Create a new task</span>
         </a>
+    </div>
+</div>
+
+<!-- Completed Task List -->
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Completed tasks for @ViewData["projectName"]
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="display responsive nowrap" id="completeddataTable" width="100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Completion Date</th>
+                        <th>Checked Out By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Completion Date</th>
+                        <th>Checked Out By</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @if (item.Completed)
+                        {
+                            <tr>
+                                <td>@item.taskName</td>
+                                <td>@item.Description</td>
+                                <td>@item.Importance</td>
+                                <td>@item.CompletionDate.ToString("MM/dd/yyyy")</td>
+                                <td>@item.checkoutName</td>
+                                <td>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Task Actions:</div>
+                                            <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                                            <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
+                                            <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

@@ -39,7 +39,12 @@
                         <label>Input new worker email</label>
                     </dt>
                     <dd class="col-sm-10">
-                        <input type="email" name="taskWorkers" value="" />
+                        <select class="selectpicker" id="taskWorkers" name="taskWorkers" size="3">
+                            @foreach(String emailOption in (ViewData["possibleWorkers"] as List<String>))
+                            {
+                                <option value="@emailOption">@emailOption</option>
+                            }
+                        </select>
                     </dd>
                 </dl>
             </div>

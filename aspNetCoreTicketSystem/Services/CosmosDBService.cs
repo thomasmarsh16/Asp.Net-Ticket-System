@@ -119,7 +119,7 @@
         // comment async services
         public async Task<List<Comment>> GetCommentsAsync(string taskID)
         {
-            QueryDefinition query = new QueryDefinition("SELECT * FROM c WHERE c.TaskID = @taskID ORDER BY c.dueDate")
+            QueryDefinition query = new QueryDefinition("SELECT * FROM c WHERE c.TaskID = @taskID ORDER BY c.DateTimeCreated")
             .WithParameter("@taskID", taskID);
 
             var queryResults = this._container.GetItemQueryIterator<Comment>(query);
