@@ -34,9 +34,9 @@
                 <label>Description</label>
                 <p>@Model.Description</p>
                 <label>Start Date</label>
-                <p>@Model.StartDate</p>
+                <p>@Model.StartDate.ToShortDateString()</p>
                 <label>Due Date</label>
-                <p>@Model.dueDate</p>
+                <p>@Model.dueDate.ToShortDateString()</p>
             </div>
         </div>
     </div>
@@ -45,17 +45,23 @@
 
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Comments for @Model.taskName</h6>
+        <form action="/Task/Details" method="Post">
+            <label for="commentBox">Enter a comment: </label>
+            <input type="text" id="commentBox" name="comment">
+            <input type="hidden" name="taskID" value="@Model.Id">
+            <input type="submit" value="Submit">
+        </form>
     </div>
     <div class="card-body">
 
-    </div>
-    <div class="card-footer">
-        <form action="/Task/AddComment" method="Post">
-            <label for="commentBox">Enter a comment: </label>
-            <input type="text" id="commentBox" name="commentContents">
-            <input type="hidden" name="taskID" value="@Model.Id"><br><br>
-            <input type="submit" value="Submit">
-        </form>
+        @foreach(Comment comment in (ViewData["taskComments"] as List<Comment>))
+        {
+            <hr />
+                @comment.CommentString <br />
+                <label>Commented by: </label> @comment.CreatorName <br />
+                <label>At Date and Time: </label> @comment.DateTimeCreated
+
+            <hr />
+        }
     </div>
 </div>

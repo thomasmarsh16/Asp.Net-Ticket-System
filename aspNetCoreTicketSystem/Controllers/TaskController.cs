@@ -22,36 +22,21 @@ namespace aspNetCoreTicketSystem.Controllers
             _cosmosDbService = cosmosDbService;
         }
 
-        
         [ActionName("Index")]
         public async Task<IActionResult> Index( string id )
         {
             Project temp = await _cosmosDbService.GetProjectAsync(id);
             List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
 
-            int numLow = 0;
-            int numMed = 0;
-            int numHigh = 0;
+            List<int> categoryNumbers = ProjectTask.categorizeTasks(sortedTasks);
+            Dictionary<string, int> tempDict = ProjectTask.countCompletionDates(sortedTasks);
 
-            foreach( ProjectTask task in sortedTasks )
-            {
-                switch(task.Importance)
-                {
-                    case "Low":
-                        numLow++;
-                        break;
-                    case "Medium":
-                        numMed++;
-                        break;
-                    case "High":
-                        numHigh++;
-                        break;
-                }
-            }
+            ViewData["completionDates"] = ProjectTask.formatListForView( tempDict.Keys.ToList() );
+            ViewData["completionNumbers"] = ProjectTask.formatListForView( tempDict.Values.ToList() );
 
             ViewData["projectName"] = temp.ProjectName;
             ViewData["projectID"] = temp.ProjectId;
-            ViewData["pieChart"] = "[\"" + numLow +"\",\"" + numMed + "\",\"" + numHigh + "\"]";
+            ViewData["pieChart"] = "[\"" + categoryNumbers[0] + "\",\"" + categoryNumbers[1] + "\",\"" + categoryNumbers[2] + "\"]";
             
             return View(sortedTasks);
         }
@@ -75,6 +60,7 @@ namespace aspNetCoreTicketSystem.Controllers
                 task.Id = Guid.NewGuid().ToString();
                 task.ProjectID = id;
                 task.Completed = false;
+                task.dueDate = task.dueDate.Date;
                 task.taskWorkers = new List<string>();
                 task.taskWorkers.Add( User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value );
                 await _cosmosDbService.AddTaskAsync( task );
@@ -100,6 +86,12 @@ namespace aspNetCoreTicketSystem.Controllers
                 {
                     task.CompletionDate = DateTime.Now;
                     task.checkoutName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+                    if ( !task.checkoutName.Equals(User.Identity.Name))
+                    {
+                        task.checkoutName = task.checkoutName + ", " + User.Identity.Name;
+                    }
+                    
                 }
                 await _cosmosDbService.UpdateTaskAsync(task.Id, task);
                 return Redirect("/Task/Index?id=" + task.ProjectID);
@@ -165,10 +157,36 @@ namespace aspNetCoreTicketSystem.Controllers
             return View(currentTask );
         }
 
+        [HttpPost]
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync([FromForm] string comment, [FromForm] string taskID)
+        {
+            Comment tempCom = new Comment();
+
+            tempCom.Id = Guid.NewGuid().ToString();
+            tempCom.CommentString = comment;
+            tempCom.CreatorName = User.Identity.Name;
+            tempCom.TaskID = taskID;
+            tempCom.DateTimeCreated = DateTime.Now;
+
+            await _cosmosDbService.AddCommentAsync(tempCom);
+
+            return Redirect("/Task/Details?id=" + taskID);
+        }
+
         [ActionName("AddWorker")]
         public async Task<ActionResult> AddWorkerAsync(string id, string projectID)
         {
             ProjectTask task = await _cosmosDbService.GetTaskAsync(id);
+            Project proj = await _cosmosDbService.GetProjectAsync(task.ProjectID);
+
+            foreach( string worker in task.taskWorkers )
+            {
+                proj.projectWorkers.Remove(worker);
+            }
+
+            ViewData["possibleWorkers"] = proj.projectWorkers;
+
 
             return View(task);
         }
