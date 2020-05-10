@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 using System.Collections;
+using System.Globalization;
 
 namespace aspNetCoreTicketSystem.Models
 {
@@ -72,37 +73,34 @@ namespace aspNetCoreTicketSystem.Models
             return categoryNums;
         }
 
-        public static Dictionary<string,int> countCompletionDates( List<ProjectTask> taskList )
+        public static Dictionary<string,int> countCompletionDatesByMonth( List<ProjectTask> taskList )
         {
             Dictionary<string, int> dateCounts = new Dictionary<string, int>();
+            DateTime dateNow = DateTime.Today.AddMonths(1);
 
-            taskList.Sort(delegate (ProjectTask x, ProjectTask y) 
-            { 
-                if( x.CompletionDate < y.CompletionDate)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
-            });
+            foreach (var i in Enumerable.Range(0, 12)) // set range of months viewed to 12
+            {
+                int numSub = (12 - i) * -1;
+                dateCounts.Add( dateNow.AddMonths(numSub).ToString("MMMM yyyy"), 0);
+            }
+
+            taskList.Sort((x, y) => DateTime.Compare(x.CompletionDate, y.CompletionDate));
 
             foreach (ProjectTask task in taskList)
             {
-                if( dateCounts.ContainsKey( task.CompletionDate.ToShortDateString() ) )
+                string monthString = task.CompletionDate.ToString("MMMM yyyy");
+
+                if (task.CompletionDate.ToShortDateString().Equals("1/1/0001")) // default for tasks that have not been completed
                 {
-                    dateCounts[task.CompletionDate.ToShortDateString()]++;
+                    // do not add to dictionary
                 }
-                else if( task.CompletionDate.ToShortDateString().Equals("1/1/0001")) // default for tasks that have not been completed
+                else if(dateCounts.ContainsKey(monthString) ) // Add only finished tasks for the last 12 months
                 {
-                    
-                }
-                else
-                {
-                    dateCounts.Add(task.CompletionDate.ToShortDateString(), 1);
+                    dateCounts[monthString]++;
                 }
             }
+
+            
 
             return dateCounts;
         }
@@ -114,7 +112,7 @@ namespace aspNetCoreTicketSystem.Models
 
             foreach ( string value in values )
             {
-                string temp = value;
+                string temp = "Month: " + value;
 
                 if ( (count + 1) != values.Count())
                 {

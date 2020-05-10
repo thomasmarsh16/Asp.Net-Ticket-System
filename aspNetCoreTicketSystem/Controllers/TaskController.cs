@@ -29,7 +29,7 @@ namespace aspNetCoreTicketSystem.Controllers
             List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
 
             List<int> categoryNumbers = ProjectTask.categorizeTasks(sortedTasks);
-            Dictionary<string, int> tempDict = ProjectTask.countCompletionDates(sortedTasks);
+            Dictionary<string, int> tempDict = ProjectTask.countCompletionDatesByMonth(sortedTasks);
 
             ViewData["completionDates"] = ProjectTask.formatListForView( tempDict.Keys.ToList() );
             ViewData["completionNumbers"] = ProjectTask.formatListForView( tempDict.Values.ToList() );
