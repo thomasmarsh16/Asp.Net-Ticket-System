@@ -88,6 +88,10 @@
                                             <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
                                             <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
                                             <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                                            @if (Convert.ToBoolean(ViewData["isManager"]))
+                                            {
+                                                <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Workers</a>
+                                            }
                                         </div>
                                     </div>
                                 </td>

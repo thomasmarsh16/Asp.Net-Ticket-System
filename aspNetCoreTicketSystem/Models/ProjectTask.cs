@@ -46,14 +46,17 @@ namespace aspNetCoreTicketSystem.Models
 
         [JsonProperty(PropertyName = "checkoutName")]
         public string checkoutName { get; set; }
+    }
 
+    public class TaskMethods
+    {
         public static List<int> categorizeTasks(List<ProjectTask> taskList)
         {
             List<int> categoryNums = new List<int>() { 0, 0, 0 }; // low, medium, high categories
 
             foreach (ProjectTask task in taskList)
             {
-                if ( !task.Completed )
+                if (!task.Completed)
                 {
                     switch (task.Importance)
                     {
@@ -73,7 +76,7 @@ namespace aspNetCoreTicketSystem.Models
             return categoryNums;
         }
 
-        public static Dictionary<string,int> countCompletionDatesByMonth( List<ProjectTask> taskList )
+        public static Dictionary<string, int> countCompletionDatesByMonth(List<ProjectTask> taskList)
         {
             Dictionary<string, int> dateCounts = new Dictionary<string, int>();
             DateTime dateNow = DateTime.Today.AddMonths(1);
@@ -81,7 +84,7 @@ namespace aspNetCoreTicketSystem.Models
             foreach (var i in Enumerable.Range(0, 12)) // set range of months viewed to 12
             {
                 int numSub = (12 - i) * -1;
-                dateCounts.Add( dateNow.AddMonths(numSub).ToString("MMMM yyyy"), 0);
+                dateCounts.Add(dateNow.AddMonths(numSub).ToString("MMMM yyyy"), 0);
             }
 
             taskList.Sort((x, y) => DateTime.Compare(x.CompletionDate, y.CompletionDate));
@@ -94,27 +97,27 @@ namespace aspNetCoreTicketSystem.Models
                 {
                     // do not add to dictionary
                 }
-                else if(dateCounts.ContainsKey(monthString) ) // Add only finished tasks for the last 12 months
+                else if (dateCounts.ContainsKey(monthString)) // Add only finished tasks for the last 12 months
                 {
                     dateCounts[monthString]++;
                 }
             }
 
-            
+
 
             return dateCounts;
         }
 
-        public static string formatListForView( List<String> values)
+        public static string formatListForView(List<String> values)
         {
             string formattedString = "[\"";
             int count = 0;
 
-            foreach ( string value in values )
+            foreach (string value in values)
             {
                 string temp = "Month: " + value;
 
-                if ( (count + 1) != values.Count())
+                if ((count + 1) != values.Count())
                 {
                     temp += "\",\"";
                 }
@@ -135,9 +138,9 @@ namespace aspNetCoreTicketSystem.Models
 
             foreach (int value in values)
             {
-                string temp = value +"";
+                string temp = value + "";
 
-                if ( (count + 1) != values.Count() )
+                if ((count + 1) != values.Count())
                 {
                     temp += "\",\"";
                 }

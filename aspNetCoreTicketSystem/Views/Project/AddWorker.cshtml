@@ -14,18 +14,25 @@
             </div>
 
             <div class="card-body">
-                <div class="col-md-2">
-                    <label><em>Emails</em></label>
-                </div>
-                <dl>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label><em>Emails</em></label>
+                            <label><em>Viewer Actions</em></label>
+                        </div>
+                        @foreach (string email in Model.projectWorkers)
+                        {
+                            <div class="row">
+                                <p>@email &nbsp; | &nbsp;</p>
+                                <p>@Html.ActionLink("Tasks", "WorkerDetails", new { email = email })&nbsp; | &nbsp;</p>
+                                <p>
+                                    <a href="#" data-toggle="modal" data-target="#removeViewerModal" data-whatever="@email">
+                                        Remove Viewer
+                                    </a>
+                                </p>
+                            </div>
 
-                    @foreach (string email in Model.projectWorkers)
-                    {
-                        <dd class="col-sm-10">
-                            <p>@email</p>
-                        </dd>
-                    }
-                </dl>
+                        }
+                    </div>
             </div>
         </div>
 
@@ -60,4 +67,36 @@
         </div>
 
     </div>
+
+    <!-- Remove Worker Modal-->
+    <div class="modal fade" id="removeViewerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirm Removal</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="email" class="form-control" id="viewer-email"> <br />
+                    Select Remove below if you want to remove the viewer from the project.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <input type="submit" value="Remove Viewer" class="btn btn-danger" />
+                </div>
+            </div>
+        </div>
+    </div>
 }
+
+<script>
+    $('#removeViewerModal').on('show.bs.modal', function (event) {
+        var link = $(event.relatedTarget)
+        var recipient = link.data('whatever')
+
+        var modal = $(this)
+        modal.find('.modal-body input').val(recipient)
+})
+</script>

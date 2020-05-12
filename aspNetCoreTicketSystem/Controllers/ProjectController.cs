@@ -29,8 +29,14 @@ namespace aspNetCoreTicketSystem.Controllers
         public async Task<IActionResult> Index()
         {
             string userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
+            ViewData["UserEmail"] = userEmail;
             return View(await _cosmosDbService.GetProjectsAsync(userEmail));
+        }
+
+        [ActionName("Details")]
+        public async Task<ActionResult> DetailsAsync(string id)
+        {
+            return Redirect("/Task/Index?id=" + id);
         }
 
         [ActionName("Create")]
@@ -58,52 +64,64 @@ namespace aspNetCoreTicketSystem.Controllers
             return View(project);
         }
 
+        [ActionName("Edit")]
+        public async Task<ActionResult> EditAsync(string id)
+        {
+            Project project = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (ProjectMethods.isManager(project, userEmail))
+            {
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                return View(project);
+            }
+            
+            return Redirect("/Home/Error");
+        }
+
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate,projectWorkers")] Project project, string id)
         {
-            if (ModelState.IsValid)
-            {
-                project.ProjectId = id;
-                await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
-                return Redirect("/Project/Index");
-            }
-            return View(project);
-        }
+            Project projectCompare = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-        [ActionName("Edit")]
-        public async Task<ActionResult> EditAsync(string id)
-        {
-            if (id == null)
+            if (ProjectMethods.isManager(projectCompare, userEmail))
             {
-                return BadRequest();
+                if (ModelState.IsValid)
+                {
+                    project.ProjectId = id;
+                    await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+                    return Redirect("/Project/Index");
+                }
+                return View(project);
             }
 
-            Project task = await _cosmosDbService.GetProjectAsync(id);
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            return View(task);
+            return Redirect("/Home/Error");
         }
 
         [ActionName("Delete")]
         public async Task<ActionResult> DeleteAsync(string id)
         {
-            if (id == null)
+            Project project = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (ProjectMethods.isManager(project, userEmail))
             {
-                return BadRequest();
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                return View(project);
             }
 
-            Project task = await _cosmosDbService.GetProjectAsync(id);
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            return View(task);
+            return Redirect("/Home/Error");
         }
 
         [HttpPost]
@@ -111,22 +129,35 @@ namespace aspNetCoreTicketSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmedAsync([Bind("Id")] string id)
         {
-            await _cosmosDbService.DeleteProjectAsync(id);
-            return Redirect("/Project/Index");
-        }
+            Project project = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-        [ActionName("Details")]
-        public async Task<ActionResult> DetailsAsync(string id)
-        {
-            return Redirect("/Task/Index?id=" + id);
+            if (ProjectMethods.isManager(project, userEmail))
+            {
+                await _cosmosDbService.DeleteProjectAsync(id);
+                return Redirect("/Project/Index");
+            }
+
+            return Redirect("/Home/Error");
         }
 
         [ActionName("AddWorker")]
         public async Task<ActionResult> AddWorkerAsync(string id)
         {
             Project project = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            return View(project);
+            if (ProjectMethods.isManager(project, userEmail))
+            {
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                return View(project);
+            }
+
+            return Redirect("/Home/Error");
         }
 
         [HttpPost]
@@ -135,24 +166,30 @@ namespace aspNetCoreTicketSystem.Controllers
         public async Task<ActionResult> AddWorkerAsync([FromForm] string projectWorker, string projectID)
         {
             Project project = await _cosmosDbService.GetProjectAsync(projectID);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            if ( !project.projectWorkers.Contains(projectWorker) ) // if new worker not in project viewers update list.
+            if (ProjectMethods.isManager(project, userEmail))
             {
-                project.projectWorkers.Add(projectWorker);
-                await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+                if (!project.projectWorkers.Contains(projectWorker)) // if new worker not in project viewers update list.
+                {
+                    project.projectWorkers.Add(projectWorker);
+                    await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
 
-                var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-                var client = new SendGridClient(apiKey);
-                var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
-                var subject = "You have been invited to work on a tickbox project";
-                var to = new EmailAddress(projectWorker, "");
-                var plainTextContent = "Congradulations, " + User.Identity.Name + " has invited you to work on a project at tickbox, click the link to view the project ";
-                var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
-                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                var response = await client.SendEmailAsync(msg);
+                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                    var client = new SendGridClient(apiKey);
+                    var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                    var subject = "You have been invited to work on a tickbox project";
+                    var to = new EmailAddress(projectWorker, "");
+                    var plainTextContent = "Congradulations, " + User.Identity.Name + " has invited you to work on a project at tickbox, click the link to view the project ";
+                    var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                    var response = await client.SendEmailAsync(msg);
+                }
+
+                return Redirect("/Project/Index");
             }
 
-            return Redirect("/Project/Index");
+            return Redirect("/Home/Error");
         }
     }
 }
