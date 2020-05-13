@@ -25,7 +25,7 @@
                                 <p>@email &nbsp; | &nbsp;</p>
                                 <p>@Html.ActionLink("Tasks", "WorkerDetails", new { email = email })&nbsp; | &nbsp;</p>
                                 <p>
-                                    <a href="#" data-toggle="modal" data-target="#removeViewerModal" data-whatever="@email">
+                                    <a href="#" data-toggle="modal" data-target="#removeViewerModal" data-email="@email">
                                         Remove Viewer
                                     </a>
                                 </p>
@@ -79,7 +79,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <input type="email" class="form-control" id="viewer-email"> <br />
+                    <input type="email" class="form-control" name="viewerEmail"> <br />
                     Select Remove below if you want to remove the viewer from the project.
                 </div>
                 <div class="modal-footer">
@@ -94,9 +94,9 @@
 <script>
     $('#removeViewerModal').on('show.bs.modal', function (event) {
         var link = $(event.relatedTarget)
-        var recipient = link.data('whatever')
+        var viewerToRemove = link.data('email')
 
         var modal = $(this)
-        modal.find('.modal-body input').val(recipient)
+        modal.find('.modal-body input').val(viewerToRemove)
 })
 </script>

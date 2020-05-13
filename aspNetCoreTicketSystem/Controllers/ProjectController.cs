@@ -163,30 +163,51 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("AddWorker")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddWorkerAsync([FromForm] string projectWorker, string projectID)
+        public async Task<ActionResult> AddWorkerAsync([FromForm] string projectWorker, string projectID, [FromForm] string viewerEmail)
         {
             Project project = await _cosmosDbService.GetProjectAsync(projectID);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
             if (ProjectMethods.isManager(project, userEmail))
             {
-                if (!project.projectWorkers.Contains(projectWorker)) // if new worker not in project viewers update list.
+                if ( projectWorker == null ) // action is to remove project viewer
                 {
-                    project.projectWorkers.Add(projectWorker);
-                    await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+                    if ( project.projectWorkers.Contains(viewerEmail))
+                    {
+                        project.projectWorkers.Remove(viewerEmail);
+                        await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
 
-                    var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-                    var client = new SendGridClient(apiKey);
-                    var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
-                    var subject = "You have been invited to work on a tickbox project";
-                    var to = new EmailAddress(projectWorker, "");
-                    var plainTextContent = "Congradulations, " + User.Identity.Name + " has invited you to work on a project at tickbox, click the link to view the project ";
-                    var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
-                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                    var response = await client.SendEmailAsync(msg);
+                        var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                        var client = new SendGridClient(apiKey);
+                        var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                        var subject = "You have been taken off of a tickbox project";
+                        var to = new EmailAddress(projectWorker, "");
+                        var plainTextContent = User.Identity.Name + " has taken you off of project " + project.ProjectName + " on tickbox.";
+                        var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                        var response = await client.SendEmailAsync(msg);
+                    }
+                }
+                else // action is to add viewer
+                {
+                    if (!project.projectWorkers.Contains(projectWorker)) // if new worker not in project viewers update list.
+                    {
+                        project.projectWorkers.Add(projectWorker);
+                        await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+
+                        var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                        var client = new SendGridClient(apiKey);
+                        var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                        var subject = "You have been invited to work on a tickbox project";
+                        var to = new EmailAddress(projectWorker, "");
+                        var plainTextContent = "Congradulations, " + User.Identity.Name + " has invited you to work on a project at tickbox, click the link to view the project ";
+                        var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                        var response = await client.SendEmailAsync(msg);
+                    }
                 }
 
-                return Redirect("/Project/Index");
+                return Redirect("/Project/AddWorker/" + project.ProjectId.ToString());
             }
 
             return Redirect("/Home/Error");
