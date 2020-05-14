@@ -24,7 +24,7 @@
         <div class="card shadow mb-4">
             <!-- Card Header - Dropdown -->
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Task Importance Breakdown</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Remaining Task Importance Breakdown</h6>
             </div>
             <!-- Card Body -->
             <div class="card-body">
@@ -54,6 +54,7 @@
                         <th>Importance</th>
                         <th>Start Date</th>
                         <th>Due Date</th>
+                        <th>Workers</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -64,6 +65,7 @@
                         <th>Importance</th>
                         <th>Start Date</th>
                         <th>Due Date</th>
+                        <th>Workers</th>
                         <th>Actions</th>
                     </tr>
                 </tfoot>
@@ -79,6 +81,14 @@
                                 <td>@item.StartDate.ToString("MM/dd/yyyy")</td>
                                 <td>@item.dueDate.ToString("MM/dd/yyyy")</td>
                                 <td>
+                                    <ul>
+                                        @foreach (var worker in item.taskWorkers)
+                                        {
+                                            <li>@worker</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
@@ -88,6 +98,10 @@
                                             <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
                                             <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
                                             <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                                                @if (Convert.ToBoolean(ViewData["isManager"]))
+                                                {
+                                                    <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Workers</a>
+                                                }
                                         </div>
                                     </div>
                                 </td>
@@ -124,6 +138,7 @@
                         <th>Importance</th>
                         <th>Completion Date</th>
                         <th>Checked Out By</th>
+                        <th>Workers</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -134,6 +149,7 @@
                         <th>Importance</th>
                         <th>Completion Date</th>
                         <th>Checked Out By</th>
+                        <th>Workers</th>
                         <th>Actions</th>
                     </tr>
                 </tfoot>
@@ -149,6 +165,14 @@
                                 <td>@item.CompletionDate.ToString("MM/dd/yyyy")</td>
                                 <td>@item.checkoutName</td>
                                 <td>
+                                    <ul>
+                                        @foreach (var worker in item.taskWorkers)
+                                        {
+                                            <li>@worker</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
@@ -157,7 +181,6 @@
                                             <div class="dropdown-header">Task Actions:</div>
                                             <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
                                             <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
-                                            <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
                                         </div>
                                     </div>
                                 </td>

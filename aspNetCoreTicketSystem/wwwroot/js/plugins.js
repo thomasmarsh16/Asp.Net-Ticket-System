@@ -54,4 +54,6 @@
             cutoutPercentage: 70,
         },
     });
+
+    $('#unassignedDataTable').DataTable(); // start data table
 }

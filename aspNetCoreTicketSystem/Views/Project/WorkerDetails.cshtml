@@ -1,0 +1,296 @@
+﻿@model IEnumerable<aspNetCoreTicketSystem.Models.ProjectTask>
+
+@{
+    ViewData["Title"] = "WorkerDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using System.Linq
+
+<div class="row">
+
+    <div class="col-xl-8 col-lg-7">
+
+        <!-- History Line Chart -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Completion History for worker @ViewData["workerEmail"] on project @ViewData["projectName"]. </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="completionChart" data-completionnum='@ViewData["completionNumbers"]' data-completiondates='@ViewData["completionDates"]' class="chartjs"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donut Chart for task importance -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Assigned Task Importance Breakdown</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4">
+                    <canvas width="348" height="316" class="chartjs" data-numbers='@ViewData["pieChart"]' id="categoriesPieChart" style="width: 279px; height: 253px; display: block;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="card shadow mb-2">
+        <div class="card-header">
+            @Html.ActionLink("Back to Project Workers", "AddWorker", new { id = ViewData["projectID"] })
+        </div>
+    </div>
+
+    <!-- Uncompleted Assigned Task list -->
+    <div class="card shadow mb-5">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Uncompleted tasks for @ViewData["projectName"] assigned to @ViewData["workerEmail"]
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="display responsive nowrap" id="dataTable" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Importance</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th>Current Workers</th>
+                            <th>Assigned</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Importance</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th>Current Workers</th>
+                            <th>Assigned</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (ProjectTask task in (ViewData["tasks"] as List<ProjectTask>))
+                        {
+                            @if (!task.Completed && task.taskWorkers.Contains(ViewData["workerEmail"]))
+                            {
+                                <tr>
+                                    <td>@task.taskName</td>
+                                    <td>@task.Description</td>
+                                    <td>@task.Importance</td>
+                                    <td>@task.StartDate.ToString("MM/dd/yyyy")</td>
+                                    <td>@task.dueDate.ToString("MM/dd/yyyy")</td>
+                                    <td>
+                                        <ul>
+                                            @foreach (var worker in task.taskWorkers)
+                                            {
+                                                <li>@worker</li>
+                                            }
+                                        </ul>
+
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" id="@task.Id" checked="checked" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <input type="submit" value="Submit Changes" class="btn btn-primary" />
+        </div>
+    </div>
+
+    <!-- Unassigned Uncompleted Task list -->
+    <div class="card shadow mb-5">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Uncompleted tasks for @ViewData["projectName"] not assigned to @ViewData["workerEmail"]
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="display responsive nowrap" id="unassignedDataTable" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Importance</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th>Current Workers</th>
+                            <th>Assigned</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Importance</th>
+                            <th>Start Date</th>
+                            <th>Due Date</th>
+                            <th>Current Workers</th>
+                            <th>Assigned</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        @foreach (ProjectTask task in (ViewData["tasks"] as List<ProjectTask>))
+                        {
+                            @if (!task.Completed && !task.taskWorkers.Contains(ViewData["workerEmail"]))
+                            {
+                                <tr>
+                                    <td>@task.taskName</td>
+                                    <td>@task.Description</td>
+                                    <td>@task.Importance</td>
+                                    <td>@task.StartDate.ToString("MM/dd/yyyy")</td>
+                                    <td>@task.dueDate.ToString("MM/dd/yyyy")</td>
+                                    <td>
+                                        <ul>
+                                            @foreach (var worker in task.taskWorkers)
+                                            {
+                                                <li>@worker</li>
+                                            }
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        <input type="checkbox" id="@task.Id" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <input type="submit" value="Submit Changes" class="btn btn-primary" />
+        </div>
+    </div>
+
+    <input type="hidden" id="taskAdd" name="addedTasks" value="" />
+    <input type="hidden" id="taskRemove" name="removedTasks" value="" />
+}
+
+<!-- Completed Task list -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Completed tasks for @ViewData["workerEmail"] on project: @ViewData["projectName"]
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="display responsive nowrap" id="completeddataTable" width="100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Completion Date</th>
+                        <th>Checked Out By</th>
+                        <th>Workers</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Completion Date</th>
+                        <th>Checked Out By</th>
+                        <th>Workers</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @if (item.Completed)
+                        {
+                    <tr>
+                        <td>@item.taskName</td>
+                        <td>@item.Description</td>
+                        <td>@item.Importance</td>
+                        <td>@item.CompletionDate.ToString("MM/dd/yyyy")</td>
+                        <td>@item.checkoutName</td>
+                        <td>
+                            <ul>
+                                @foreach (var worker in item.taskWorkers)
+                                {
+                                    <li>@worker</li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    var checkMap = new Map();
+    var checkedTask = "";
+    var uncheckedTask = "";
+
+    $('input:checkbox').change(
+        function () {
+
+            var checkboxID = $(this).attr("id").toString();
+            var boolCheck = false;
+
+            if ($(this).is(':checked')) {
+                boolCheck = true;
+            }
+
+            if (checkMap.has(checkboxID)) // if there is a record and state is changed again
+            {                             // then it is a reversion and does not need to be recorded
+                checkMap.delete(checkboxID);
+            }
+            else {
+                checkMap.set(checkboxID, boolCheck);
+            }
+        });
+
+    $("form").submit(function () {
+
+        if (checkMap.size != 0) {
+            for (let [key, value] of checkMap) {
+
+                if (value) {
+                    checkedTask += key + ",";
+                }
+                else {
+                    uncheckedTask += key + ",";
+                }
+            }
+        }
+
+        if (checkedTask.length > 0) {
+            checkedTask = checkedTask.substring(0, checkedTask.length - 1);
+        }
+
+        if (uncheckedTask.length > 0) {
+            uncheckedTask = uncheckedTask.substring(0, uncheckedTask.length - 1);
+        }
+
+        $("#taskAdd").val(checkedTask);
+        $("#taskRemove").val(uncheckedTask);
+    });
+</script>

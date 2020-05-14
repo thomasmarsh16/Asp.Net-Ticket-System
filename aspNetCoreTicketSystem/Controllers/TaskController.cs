@@ -10,7 +10,6 @@ using aspNetCoreTicketSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
-
 namespace aspNetCoreTicketSystem.Controllers
 {
     [Authorize]
@@ -25,18 +24,20 @@ namespace aspNetCoreTicketSystem.Controllers
         [ActionName("Index")]
         public async Task<IActionResult> Index( string id )
         {
+            string userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             Project temp = await _cosmosDbService.GetProjectAsync(id);
-            List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
+            List<ProjectTask> sortedTasks = TaskMethods.FilterTasksByWorkerEmail( await _cosmosDbService.GetTasksAsync(id), userEmail );
 
-            List<int> categoryNumbers = ProjectTask.categorizeTasks(sortedTasks);
-            Dictionary<string, int> tempDict = ProjectTask.countCompletionDates(sortedTasks);
+            List<int> categoryNumbers = TaskMethods.CategorizeTasks(sortedTasks);
+            Dictionary<string, int> tempDict = TaskMethods.CountCompletionDatesByMonth(sortedTasks);
 
-            ViewData["completionDates"] = ProjectTask.formatListForView( tempDict.Keys.ToList() );
-            ViewData["completionNumbers"] = ProjectTask.formatListForView( tempDict.Values.ToList() );
+            ViewData["completionDates"] = TaskMethods.FormatListForView( tempDict.Keys.ToList() );
+            ViewData["completionNumbers"] = TaskMethods.FormatListForView( tempDict.Values.ToList() );
 
+            ViewData["isManager"] = ProjectMethods.isManager(temp,userEmail);
             ViewData["projectName"] = temp.ProjectName;
             ViewData["projectID"] = temp.ProjectId;
-            ViewData["pieChart"] = "[\"" + categoryNumbers[0] + "\",\"" + categoryNumbers[1] + "\",\"" + categoryNumbers[2] + "\"]";
+            ViewData["pieChart"] = TaskMethods.FormatListForView( categoryNumbers );
             
             return View(sortedTasks);
         }
@@ -178,17 +179,23 @@ namespace aspNetCoreTicketSystem.Controllers
         public async Task<ActionResult> AddWorkerAsync(string id, string projectID)
         {
             ProjectTask task = await _cosmosDbService.GetTaskAsync(id);
-            Project proj = await _cosmosDbService.GetProjectAsync(task.ProjectID);
+            Project project = await _cosmosDbService.GetProjectAsync(task.ProjectID);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
-            foreach( string worker in task.taskWorkers )
+            if (ProjectMethods.isManager(project, userEmail))
             {
-                proj.projectWorkers.Remove(worker);
+                foreach (string worker in task.taskWorkers)
+                {
+                    project.projectWorkers.Remove(worker);
+                }
+
+                ViewData["possibleWorkers"] = project.projectWorkers;
+
+
+                return View(task);
             }
 
-            ViewData["possibleWorkers"] = proj.projectWorkers;
-
-
-            return View(task);
+            return Redirect("/Home/Error");
         }
 
         [HttpPost]
@@ -196,13 +203,21 @@ namespace aspNetCoreTicketSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> AddWorkerAsync([FromForm] string taskWorkers, string id, string projectID)
         {
+            Project project = await _cosmosDbService.GetProjectAsync(projectID);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             ProjectTask task = await _cosmosDbService.GetTaskAsync(id);
 
-            task.taskWorkers.Add(taskWorkers);
+            if (ProjectMethods.isManager(project, userEmail))
+            {
+                task.taskWorkers.Add(taskWorkers);
 
-            await _cosmosDbService.UpdateTaskAsync(task.Id, task);
+                await _cosmosDbService.UpdateTaskAsync(task.Id, task);
 
-            return Redirect("/Task/Index?id=" + projectID);
+                return Redirect("/Task/Index?id=" + projectID);
+            }
+
+            return Redirect("/Home/Error");
+
         }
     }
 }

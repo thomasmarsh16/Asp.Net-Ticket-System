@@ -36,4 +36,19 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "projectWorkers")]
         public List<string> projectWorkers { get; set; }
     }
+
+    public class ProjectMethods
+    {
+        public static Boolean isManager( Project project, String managerEmail )
+        {
+            Boolean isManag = false;
+
+            if ( project.ProjectManager.Contains(managerEmail) )
+            {
+                isManag = true;
+            }
+
+            return isManag;
+        }
+    }
 }
