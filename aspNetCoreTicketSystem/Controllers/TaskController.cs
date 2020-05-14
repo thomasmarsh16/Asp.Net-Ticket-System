@@ -26,18 +26,18 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             string userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             Project temp = await _cosmosDbService.GetProjectAsync(id);
-            List<ProjectTask> sortedTasks = await _cosmosDbService.GetTasksAsync(id);
+            List<ProjectTask> sortedTasks = TaskMethods.FilterTasksByWorkerEmail( await _cosmosDbService.GetTasksAsync(id), userEmail );
 
-            List<int> categoryNumbers = TaskMethods.categorizeTasks(sortedTasks);
-            Dictionary<string, int> tempDict = TaskMethods.countCompletionDatesByMonth(sortedTasks);
+            List<int> categoryNumbers = TaskMethods.CategorizeTasks(sortedTasks);
+            Dictionary<string, int> tempDict = TaskMethods.CountCompletionDatesByMonth(sortedTasks);
 
-            ViewData["completionDates"] = TaskMethods.formatListForView( tempDict.Keys.ToList() );
-            ViewData["completionNumbers"] = TaskMethods.formatListForView( tempDict.Values.ToList() );
+            ViewData["completionDates"] = TaskMethods.FormatListForView( tempDict.Keys.ToList() );
+            ViewData["completionNumbers"] = TaskMethods.FormatListForView( tempDict.Values.ToList() );
 
             ViewData["isManager"] = ProjectMethods.isManager(temp,userEmail);
             ViewData["projectName"] = temp.ProjectName;
             ViewData["projectID"] = temp.ProjectId;
-            ViewData["pieChart"] = TaskMethods.formatListForView( categoryNumbers );
+            ViewData["pieChart"] = TaskMethods.FormatListForView( categoryNumbers );
             
             return View(sortedTasks);
         }

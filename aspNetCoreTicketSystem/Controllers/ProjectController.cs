@@ -70,16 +70,17 @@ namespace aspNetCoreTicketSystem.Controllers
             Project project = await _cosmosDbService.GetProjectAsync(id);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
+            if (project == null)
+            {
+                return NotFound();
+            }
+
             if (ProjectMethods.isManager(project, userEmail))
             {
-                if (project == null)
-                {
-                    return NotFound();
-                }
 
                 return View(project);
             }
-            
+
             return Redirect("/Home/Error");
         }
 
@@ -90,6 +91,11 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             Project projectCompare = await _cosmosDbService.GetProjectAsync(id);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (project == null)
+            {
+                return NotFound();
+            }
 
             if (ProjectMethods.isManager(projectCompare, userEmail))
             {
@@ -111,13 +117,13 @@ namespace aspNetCoreTicketSystem.Controllers
             Project project = await _cosmosDbService.GetProjectAsync(id);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
+            if (project == null)
+            {
+                return NotFound();
+            }
+
             if (ProjectMethods.isManager(project, userEmail))
             {
-                if (project == null)
-                {
-                    return NotFound();
-                }
-
                 return View(project);
             }
 
@@ -131,6 +137,11 @@ namespace aspNetCoreTicketSystem.Controllers
         {
             Project project = await _cosmosDbService.GetProjectAsync(id);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (project == null)
+            {
+                return NotFound();
+            }
 
             if (ProjectMethods.isManager(project, userEmail))
             {
@@ -147,12 +158,21 @@ namespace aspNetCoreTicketSystem.Controllers
             Project project = await _cosmosDbService.GetProjectAsync(id);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
+            if (project == null)
+            {
+                return NotFound();
+            }
+
             if (ProjectMethods.isManager(project, userEmail))
             {
-                if (project == null)
-                {
-                    return NotFound();
-                }
+                List<ProjectTask> taskList = await _cosmosDbService.GetTasksAsync(project.ProjectId);
+                Dictionary<string, int> tempDict = TaskMethods.CountCompletionDatesByMonth(taskList);
+                List<int> categoryNumbers = TaskMethods.CategorizeTasks(taskList);
+
+                // values for completion and pie charts
+                ViewData["completionNumbers"] = TaskMethods.FormatListForView(tempDict.Values.ToList());
+                ViewData["completionDates"] = TaskMethods.FormatListForView(tempDict.Keys.ToList());
+                ViewData["pieChart"] = TaskMethods.FormatListForView(categoryNumbers);
 
                 return View(project);
             }
@@ -168,11 +188,16 @@ namespace aspNetCoreTicketSystem.Controllers
             Project project = await _cosmosDbService.GetProjectAsync(projectID);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
+            if (project == null)
+            {
+                return NotFound();
+            }
+
             if (ProjectMethods.isManager(project, userEmail))
             {
-                if ( projectWorker == null ) // action is to remove project viewer
+                if (projectWorker == null) // action is to remove project viewer
                 {
-                    if ( project.projectWorkers.Contains(viewerEmail))
+                    if (project.projectWorkers.Contains(viewerEmail))
                     {
                         project.projectWorkers.Remove(viewerEmail);
                         await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
@@ -208,6 +233,122 @@ namespace aspNetCoreTicketSystem.Controllers
                 }
 
                 return Redirect("/Project/AddWorker/" + project.ProjectId.ToString());
+            }
+
+            return Redirect("/Home/Error");
+        }
+
+        [ActionName("WorkerDetails")]
+        public async Task<ActionResult> WorkerDetailsAsync(string id, string email)
+        {
+            Project project = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            if (ProjectMethods.isManager(project, userEmail))
+            {
+                List<ProjectTask> taskList = await _cosmosDbService.GetTasksAsync(id);
+                List<ProjectTask> workerSpecificTasks = TaskMethods.FilterTasksByWorkerEmail(taskList, email);
+
+                Dictionary<string, int> tempDict = TaskMethods.CountCompletionDatesByMonth(workerSpecificTasks);
+
+                List<int> categoryNumbers = TaskMethods.CategorizeTasks(workerSpecificTasks);
+
+                ViewData["completionDates"] = TaskMethods.FormatListForView(tempDict.Keys.ToList());
+                ViewData["completionNumbers"] = TaskMethods.FormatListForView(tempDict.Values.ToList());
+                ViewData["workerEmail"] = email;
+                ViewData["projectID"] = project.ProjectId;
+                ViewData["projectName"] = project.ProjectName;
+                ViewData["tasks"] = taskList;
+                ViewData["isManager"] = true;
+
+                ViewData["pieChart"] = TaskMethods.FormatListForView(categoryNumbers);
+
+                return View(workerSpecificTasks);
+            }
+
+            return Redirect("/Home/Error");
+        }
+
+        [HttpPost]
+        [ActionName("WorkerDetails")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> WorkerDetailsAsync(string id, string email, [FromForm] string addedTasks, [FromForm] string removedTasks)
+        {
+            Project project = await _cosmosDbService.GetProjectAsync(id);
+            String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            if (ProjectMethods.isManager(project, userEmail))
+            {
+                if (addedTasks != null && !addedTasks.Equals(""))  // add tasks
+                {
+                    List<string> tasksAdd = addedTasks.Split(",").ToList();
+
+                    foreach (string taskId in tasksAdd)
+                    {
+                        ProjectTask temp = await _cosmosDbService.GetTaskAsync(taskId);
+
+                        if ( temp.taskWorkers == null )
+                        {
+                            List<string> tempList = new List<string>();
+
+                            tempList.Add(email);
+
+                            temp.taskWorkers = tempList;
+                        }
+                        else
+                        {
+                            temp.taskWorkers.Add(email);
+                        }
+
+                        await _cosmosDbService.UpdateTaskAsync(temp.Id, temp);
+
+                        var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"); // send notification email
+                        var client = new SendGridClient(apiKey);
+                        var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                        var subject = "You have been assigned a tickbox project task";
+                        var to = new EmailAddress(email, "");
+                        var plainTextContent = "Congradulations, " + User.Identity.Name + " has assigned you a task for a project at tickbox";
+                        var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                        var response = await client.SendEmailAsync(msg);
+                    }
+                }
+
+                if (removedTasks != null && !removedTasks.Equals(""))  // remove tasks
+                {
+                    List<string> tasksRemove = removedTasks.Split(",").ToList();
+
+                    foreach (string taskId in tasksRemove)
+                    {
+                        ProjectTask temp = await _cosmosDbService.GetTaskAsync(taskId);
+
+                        temp.taskWorkers.Remove(email);
+
+                        await _cosmosDbService.UpdateTaskAsync(temp.Id, temp);
+
+                        var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY"); // send notification email
+                        var client = new SendGridClient(apiKey);
+                        var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                        var subject = "You have been unassigned from a tickbox project task";
+                        var to = new EmailAddress(email, "");
+                        var plainTextContent = "Dear User, " + User.Identity.Name + " has unassigned you from a task for a project at tickbox";
+                        var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                        var response = await client.SendEmailAsync(msg);
+                    }
+                }
+
+                return Redirect("/Project/WorkerDetails/" + project.ProjectId + "?email=" + email);
             }
 
             return Redirect("/Home/Error");

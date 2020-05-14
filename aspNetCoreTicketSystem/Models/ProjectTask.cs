@@ -50,7 +50,22 @@ namespace aspNetCoreTicketSystem.Models
 
     public class TaskMethods
     {
-        public static List<int> categorizeTasks(List<ProjectTask> taskList)
+        public static List<ProjectTask> FilterTasksByWorkerEmail(List<ProjectTask> taskList, string email )
+        {
+            List<ProjectTask> filteredList = new List<ProjectTask>();
+
+            foreach( ProjectTask task in taskList )
+            {
+                if ( task.taskWorkers.Contains(email))
+                {
+                    filteredList.Add(task);
+                }
+            }
+
+            return filteredList;
+        }
+
+        public static List<int> CategorizeTasks(List<ProjectTask> taskList)
         {
             List<int> categoryNums = new List<int>() { 0, 0, 0 }; // low, medium, high categories
 
@@ -76,7 +91,7 @@ namespace aspNetCoreTicketSystem.Models
             return categoryNums;
         }
 
-        public static Dictionary<string, int> countCompletionDatesByMonth(List<ProjectTask> taskList)
+        public static Dictionary<string, int> CountCompletionDatesByMonth(List<ProjectTask> taskList)
         {
             Dictionary<string, int> dateCounts = new Dictionary<string, int>();
             DateTime dateNow = DateTime.Today.AddMonths(1);
@@ -103,12 +118,10 @@ namespace aspNetCoreTicketSystem.Models
                 }
             }
 
-
-
             return dateCounts;
         }
 
-        public static string formatListForView(List<String> values)
+        public static string FormatListForView(List<String> values)
         {
             string formattedString = "[\"";
             int count = 0;
@@ -131,7 +144,7 @@ namespace aspNetCoreTicketSystem.Models
             return formattedString;
         }
 
-        public static string formatListForView(List<int> values)
+        public static string FormatListForView(List<int> values)
         {
             string formattedString = "[\"";
             int count = 0;
