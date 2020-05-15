@@ -29,6 +29,15 @@
         public async System.Threading.Tasks.Task DeleteTaskAsync(string id)
         {
             await this._container.DeleteItemAsync<ProjectTask>(id, new PartitionKey(id));
+
+            // get comments 
+            List<Comment> comments = await GetCommentsAsync(id);
+
+            // loop through and delete all comments
+            foreach(Comment comment in comments)
+            {
+                await DeleteCommentAsync(comment.Id);
+            }
         }
 
         public async Task<ProjectTask> GetTaskAsync(string id)
@@ -112,7 +121,17 @@
 
         public async System.Threading.Tasks.Task DeleteProjectAsync(string id)
         {
+            // delete project
             await this._container.DeleteItemAsync<Project>(id, new PartitionKey(id));
+
+            // find all tasks that go with project
+            List<ProjectTask> tasks = await GetTasksAsync(id);
+
+            // loop through tasks and delete them
+            foreach( ProjectTask task in tasks)
+            {
+                await DeleteTaskAsync(task.Id);
+            }
         }
 
 
@@ -137,6 +156,11 @@
         public async System.Threading.Tasks.Task AddCommentAsync(Comment comment)
         {
             await this._container.CreateItemAsync<Comment>(comment, new PartitionKey(comment.Id));
+        }
+
+        public async System.Threading.Tasks.Task DeleteCommentAsync(string id)
+        {
+            await this._container.DeleteItemAsync<Comment>(id, new PartitionKey(id));
         }
     }
 }
