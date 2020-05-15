@@ -1,0 +1,132 @@
+﻿@model aspNetCoreTicketSystem.Models.Project
+
+<div class="row">
+
+    <div class="col-xl-8 col-lg-7">
+
+        <!-- History Line Chart -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Completion History for project @Model.ProjectName. </h6>
+            </div>
+            <div class="card-body">
+                <canvas id="completionChart" data-completionnum='@ViewData["completionNumbers"]' data-completiondates='@ViewData["completionDates"]' class="chartjs"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donut Chart for task importance -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Remaining Task Importance Breakdown</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4">
+                    <canvas width="348" height="316" class="chartjs" data-numbers='@ViewData["pieChart"]' id="categoriesPieChart" style="width: 279px; height: 253px; display: block;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary"> Current viewers for @Model.ProjectName</h6>
+            </div>
+
+            <div class="card-body">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <label><em>Viewer Emails</em></label>
+                        </div>
+                        @foreach (string email in Model.projectWorkers)
+                        {
+                            <div class="row">
+                                <p>@email &nbsp; | &nbsp;</p>
+                                <p>@Html.ActionLink("Tasks", "WorkerDetails", new { id = Model.ProjectId , email = email })&nbsp; | &nbsp;</p>
+                                <p>
+                                    <a href="#" data-toggle="modal" data-target="#removeViewerModal" data-email="@email">
+                                        Remove Viewer
+                                    </a>
+                                </p>
+                            </div>
+                        }
+                    </div>
+            </div>
+        </div>
+
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Enter in new viewer email</h6>
+            </div>
+
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        <label>Input an email to share @Model.ProjectName project with </label>
+                    </dt>
+                    <dd class="col-sm-10">
+                        <input type="email" name="projectWorker" value="" />
+                    </dd>
+                </dl>
+            </div>
+
+            <div class="card-footer">
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Add Worker" class="btn btn-danger" /> |
+                        @Html.ActionLink("Back to List", "Index")
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="form-group invisible">
+            @Html.EditorFor(model => model.ProjectId, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+
+    </div>
+
+    <!-- Remove Worker Modal-->
+    <div class="modal fade" id="removeViewerModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirm Removal</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="email" class="form-control" name="viewerEmail"> <br />
+                    Select Remove below if you want to remove the viewer from the project.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <input type="submit" value="Remove Viewer" class="btn btn-danger" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $('#removeViewerModal').on('show.bs.modal', function (event) {
+        var link = $(event.relatedTarget)
+        var viewerToRemove = link.data('email')
+
+        var modal = $(this)
+        modal.find('.modal-body input').val(viewerToRemove)
+})
+</script>

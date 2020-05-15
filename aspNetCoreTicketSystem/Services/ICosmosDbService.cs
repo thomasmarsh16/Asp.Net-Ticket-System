@@ -9,7 +9,7 @@ namespace aspNetCoreTicketSystem.Services
     public interface ICosmosDbService
     {
         // project task data async services
-        Task<IEnumerable<ProjectTask>> GetTasksAsync(string query);
+        Task<List<ProjectTask>> GetTasksAsync(string id);
         Task<ProjectTask> GetTaskAsync(string id);
         System.Threading.Tasks.Task AddTaskAsync(ProjectTask task);
         System.Threading.Tasks.Task UpdateTaskAsync(string id, ProjectTask task);
@@ -23,6 +23,9 @@ namespace aspNetCoreTicketSystem.Services
         System.Threading.Tasks.Task UpdateProjectAsync(string id, Project project);
         System.Threading.Tasks.Task DeleteProjectAsync(string id);
 
-        
+        // Task Comment async services
+        Task<List<Comment>> GetCommentsAsync(string ProjectID);
+
+        System.Threading.Tasks.Task AddCommentAsync(Comment comment);
     }
 }

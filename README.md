@@ -40,7 +40,7 @@ Intended audiences for this document are those who would like to see the reasoni
 
 1.3 Scope
 
-The main objective for this software project is to provide a ticket system which can enable monitoring and control of task completion for projects. Project managers will be able to view tasks by project groupings, who is working on certain tasks, and how long tasks have been "checked out". Workers meanwhile will be able to view what tasks they have been assigned, who else is working on the tasks, and other data for tasks.
+The main objective for this software project is to provide a ticket system which can enable monitoring and control of task completion for projects. Project managers will be able to view tasks by project groupings and who is working on certain tasks. Workers meanwhile will be able to view what tasks they have been assigned, who else is working on the tasks, and other data for tasks.
 
 1.4 Definitions and Acronyms
 
@@ -71,7 +71,7 @@ Functional requirements for this project is that it can provide users with task 
 
 3.2 System Features
 
-System features for this project are that there is an internet connection, hosting of files is done by Microsoft Azure, and the database used is SQL based.
+System features for this project are that there is an internet connection, hosting of files is done by Microsoft Azure, and the database used is Azure Cosmos Db, a no-SQL database.
 
 3.3 Nonfunctional Requirements
 

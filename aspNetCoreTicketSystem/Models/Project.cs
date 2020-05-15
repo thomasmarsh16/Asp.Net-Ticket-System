@@ -19,6 +19,9 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "projectDescription")]
         public string ProjectDescription { get; set; }
 
+        [JsonProperty(PropertyName = "projectManager")]
+        public string ProjectManager { get; set; }
+
         [JsonProperty(PropertyName = "completedProj")]
         public Boolean CompletedProj { get; set; }
 
@@ -29,5 +32,23 @@ namespace aspNetCoreTicketSystem.Models
         [JsonProperty(PropertyName = "projectCompleteDate")]
         [DataType(DataType.Date)]
         public DateTime CompletionDate { get; set; }
+
+        [JsonProperty(PropertyName = "projectWorkers")]
+        public List<string> projectWorkers { get; set; }
+    }
+
+    public class ProjectMethods
+    {
+        public static Boolean isManager( Project project, String managerEmail )
+        {
+            Boolean isManag = false;
+
+            if ( project.ProjectManager.Contains(managerEmail) )
+            {
+                isManag = true;
+            }
+
+            return isManag;
+        }
     }
 }

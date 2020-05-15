@@ -5,46 +5,63 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@Html.AntiForgeryToken()
+
+<div class="row">
+
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Workers for @Model.taskName</h6>
+            </div>
+            <div class="card-body">
+                @foreach (string email in Model.taskWorkers)
+                {
+                    <dl class="col-sm-10">
+                        <p>@email</p>
+                    </dl>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Details for @Model.taskName</h6>
+            </div>
+            <div class="card-body">
+                <label>Description</label>
+                <p>@Model.Description</p>
+                <label>Start Date</label>
+                <p>@Model.StartDate.ToShortDateString()</p>
+                <label>Due Date</label>
+                <p>@Model.dueDate.ToShortDateString()</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Task</h6></div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-2">
-                <label>Name</label>
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.taskName)
-            </dd>
-            <dt class="col-sm-2">
-                <label>Description</label>
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Description)
-            </dd>
-            <dt class="col-sm-2">
-                <label>Completed</label>
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Completed)
-            </dd>
-            <dt class="col-sm-2">
-                <label>Start Date</label>
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.StartDate)
-            </dd>
-            <dt class="col-sm-2">
-                <label>Completion Date</label>
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.CompletionDate)
-            </dd>
-        </dl>
+        <form action="/Task/Details" method="Post">
+            <label for="commentBox">Enter a comment: </label>
+            <input type="text" id="commentBox" name="comment">
+            <input type="hidden" name="taskID" value="@Model.Id">
+            <input type="submit" value="Submit">
+        </form>
     </div>
-    <div class="card-footer">
-        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-        @Html.ActionLink("Delete", "Delete", new { id = Model.Id }) |
-        @Html.ActionLink("Back to List", "Index", new { id = Model.ProjectID })
+    <div class="card-body">
+
+        @foreach(Comment comment in (ViewData["taskComments"] as List<Comment>))
+        {
+            <hr />
+                @comment.CommentString <br />
+                <label>Commented by: </label> @comment.CreatorName <br />
+                <label>At Date and Time: </label> @comment.DateTimeCreated
+
+            <hr />
+        }
     </div>
 </div>

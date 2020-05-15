@@ -4,59 +4,191 @@
     ViewData["Title"] = "taskIndex";
 }
 
+<div class="row">
 
+    <div class="col-xl-8 col-lg-7">
 
-<div class="card shadow mb-4">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">All tasks for @ViewData["projectName"]</h6>
+        <!-- History Line Chart -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Task Completion History for @ViewData["projectName"]</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="completionChart" data-completionnum='@ViewData["completionNumbers"]' data-completiondates='@ViewData["completionDates"]' class="chartjs"></canvas>
+            </div>
+        </div>
     </div>
-    <a class="nav-link" href="/Task/Create/@ViewData["projectID"]">
-        <i class="fas fa-fw fa-plus-square"></i>
-        <span>Create a new task</span>
-    </a>
-</div>
 
-
-@foreach (var item in Model)
-{
-    <div class="card shadow mb-4">
-        <!-- Card Header - Dropdown -->
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">@item.taskName</h6>
-            <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-                    <div class="dropdown-header">Project Actions:</div>
-                    <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
-                    <a class="dropdown-item" href="/Task/Checkout/@item.Id">Checkout Task</a>
-                    <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+    <!-- Donut Chart for task importance -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Remaining Task Importance Breakdown</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <div class="chart-pie pt-4">
+                    <canvas width="348" height="316" class="chartjs" data-numbers='@ViewData["pieChart"]' id="categoriesPieChart" style="width: 279px; height: 253px; display: block;"></canvas>
                 </div>
             </div>
         </div>
-        <!-- Card Body -->
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-2">
-                    <label>Description</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.Description)
-                </dd>
-                <dt class="col-sm-2">
-                    <label>Start Date</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </dd>
-                <dt class="col-sm-2">
-                    <label>Completion Date</label>
-                </dt>
-                <dd class="col-sm-10">
-                    @Html.DisplayFor(modelItem => item.CompletionDate)
-                </dd>
-            </dl>
+    </div>
+</div>
+
+<!-- Uncompleted Task list -->
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Uncompleted tasks for @ViewData["projectName"]
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="display responsive nowrap" id="dataTable" width="100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th>Workers</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Start Date</th>
+                        <th>Due Date</th>
+                        <th>Workers</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @if ( !item.Completed )
+                        {
+                            <tr>
+                                <td>@item.taskName</td>
+                                <td>@item.Description</td>
+                                <td>@item.Importance</td>
+                                <td>@item.StartDate.ToString("MM/dd/yyyy")</td>
+                                <td>@item.dueDate.ToString("MM/dd/yyyy")</td>
+                                <td>
+                                    <ul>
+                                        @foreach (var worker in item.taskWorkers)
+                                        {
+                                            <li>@worker</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Task Actions:</div>
+                                            <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                                            <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
+                                            <a class="dropdown-item" href="/Task/Delete/@item.Id?projectID=@ViewData["projectID"]">Delete</a>
+                                                @if (Convert.ToBoolean(ViewData["isManager"]))
+                                                {
+                                                    <a class="dropdown-item" href="/Task/AddWorker/@item.Id?projectID=@ViewData["projectID"]">Workers</a>
+                                                }
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
-}
+    <div class="card-footer">
+        <a class="nav-link" href="/Task/Create/@ViewData["projectID"]">
+            <i class="fas fa-fw fa-plus-square"></i>
+            <span>Create a new task</span>
+        </a>
+    </div>
+</div>
+
+<!-- Completed Task List -->
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            Completed tasks for @ViewData["projectName"]
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="display responsive nowrap" id="completeddataTable" width="100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Completion Date</th>
+                        <th>Checked Out By</th>
+                        <th>Workers</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Importance</th>
+                        <th>Completion Date</th>
+                        <th>Checked Out By</th>
+                        <th>Workers</th>
+                        <th>Actions</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        @if (item.Completed)
+                        {
+                            <tr>
+                                <td>@item.taskName</td>
+                                <td>@item.Description</td>
+                                <td>@item.Importance</td>
+                                <td>@item.CompletionDate.ToString("MM/dd/yyyy")</td>
+                                <td>@item.checkoutName</td>
+                                <td>
+                                    <ul>
+                                        @foreach (var worker in item.taskWorkers)
+                                        {
+                                            <li>@worker</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-bars fa-sm fa-fw text-gray-800"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Task Actions:</div>
+                                            <a class="dropdown-item" href="/Task/Edit/@item.Id">Edit</a>
+                                            <a class="dropdown-item" href="/Task/Details/@item.Id?projectID=@ViewData["projectID"]">Task Information</a>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
