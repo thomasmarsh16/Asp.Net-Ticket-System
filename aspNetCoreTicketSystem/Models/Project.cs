@@ -20,7 +20,7 @@ namespace aspNetCoreTicketSystem.Models
         public string ProjectDescription { get; set; }
 
         [JsonProperty(PropertyName = "projectManager")]
-        public string ProjectManager { get; set; }
+        public List<string> ProjectManager { get; set; }
 
         [JsonProperty(PropertyName = "completedProj")]
         public Boolean CompletedProj { get; set; }
@@ -43,7 +43,7 @@ namespace aspNetCoreTicketSystem.Models
         {
             Boolean isManag = false;
 
-            if ( project.ProjectManager.Contains(managerEmail) )
+            if ( project.ProjectManager.Any( name => name.Contains( managerEmail ) ))
             {
                 isManag = true;
             }

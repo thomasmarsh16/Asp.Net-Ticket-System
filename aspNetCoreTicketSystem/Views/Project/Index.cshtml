@@ -40,7 +40,14 @@
                                 <tr>
                                     <td>@item.ProjectName</td>
                                     <td>@item.ProjectDescription</td>
-                                    <td>@item.ProjectManager</td>
+                                    <td>
+                                        <ul>
+                                            @foreach (var manager in item.ProjectManager)
+                                            {
+                                                <li>@manager</li>
+                                            }
+                                        </ul>
+                                    </td>
                                     <td>
                                         <div class="dropdown no-arrow">
                                             <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -53,7 +53,8 @@ namespace aspNetCoreTicketSystem.Controllers
             if (ModelState.IsValid)
             {
                 project.ProjectId = Guid.NewGuid().ToString();
-                project.ProjectManager = User.Identity.Name + ", " + User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                project.ProjectManager = new List<string>();
+                project.ProjectManager.Add( User.Identity.Name + ", " + User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value);
                 project.CompletedProj = false;
                 project.projectWorkers = new List<string>();
                 project.projectWorkers.Add(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value);
@@ -87,7 +88,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate,projectWorkers")] Project project, string id)
+        public async Task<ActionResult> EditAsync([Bind("id,ProjectName,ProjectDescription,CompletedProj,StartDate,CompletionDate,projectWorkers,ProjectManager")] Project project, string id)
         {
             Project projectCompare = await _cosmosDbService.GetProjectAsync(id);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
