@@ -184,7 +184,7 @@ namespace aspNetCoreTicketSystem.Controllers
         [HttpPost]
         [ActionName("AddWorker")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> AddWorkerAsync([FromForm] string projectWorker, string projectID, [FromForm] string viewerEmail)
+        public async Task<ActionResult> AddWorkerAsync([FromForm] string projectWorker, string projectID, [FromForm] string viewerEmail, [FromForm] string managerEmail)
         {
             Project project = await _cosmosDbService.GetProjectAsync(projectID);
             String userEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
@@ -196,7 +196,7 @@ namespace aspNetCoreTicketSystem.Controllers
 
             if (ProjectMethods.isManager(project, userEmail))
             {
-                if (projectWorker == null) // action is to remove project viewer
+                if (projectWorker != null) // action is to remove project viewer
                 {
                     if (project.projectWorkers.Contains(viewerEmail))
                     {
@@ -214,8 +214,27 @@ namespace aspNetCoreTicketSystem.Controllers
                         var response = await client.SendEmailAsync(msg);
                     }
                 }
-                else // action is to add viewer
-                {
+                else if ( managerEmail.Length > 0 && managerEmail != null )// action is to make viewer into a manager
+                { 
+                    if ( !ProjectMethods.isManager( project, managerEmail ) ) // prevent adding an existing manager
+                    {
+                        project.ProjectManager.Add(managerEmail);
+
+                        await _cosmosDbService.UpdateProjectAsync(project.ProjectId, project);
+
+                        var apiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+                        var client = new SendGridClient(apiKey);
+                        var from = new EmailAddress(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value, User.Identity.Name);
+                        var subject = "You have been made a manager of a tickbox project";
+                        var to = new EmailAddress(projectWorker, "");
+                        var plainTextContent = User.Identity.Name + " has made you a manager for project " + project.ProjectName + " on tickbox.";
+                        var htmlContent = "link to all of your projects - - https://tickbox.azurewebsites.net/Project/Index";
+                        var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                        var response = await client.SendEmailAsync(msg);
+                    }
+                }
+                else // action is to add project viewer
+                { 
                     if (!project.projectWorkers.Contains(projectWorker)) // if new worker not in project viewers update list.
                     {
                         project.projectWorkers.Add(projectWorker);
